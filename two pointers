@@ -1,0 +1,112 @@
+Longest Word in Dictionary through Deleting
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (51.37%)	1799	359
+Tags
+two-pointers | sort
+
+Companies
+Given a string s and a string array dictionary, return the longest string in the dictionary that can be formed by deleting some of the given string characters. 
+If there is more than one possible result, return the longest word with the smallest lexicographical order. If there is no possible result, return the empty string.
+
+Example 1:
+
+Input: s = "abpcplea", dictionary = ["ale","apple","monkey","plea"]
+Output: "apple"
+To solve the problem of finding the longest word in the dictionary that can be formed by deleting characters from a given string s, we can utilize a brute force approach followed by an optimized solution. Below is a detailed explanation of the brute force method and its optimization.
+
+Problem Breakdown
+Understanding the Problem:
+
+We are given a string s and an array of strings dictionary.
+We need to find the longest string in dictionary that can be formed by deleting some characters from s.
+If there are multiple longest words, return the lexicographically smallest one.
+If no such word exists, return an empty string.
+Brute Force Approach:
+
+For each word in the dictionary, check if it can be formed by deleting characters from s.
+Keep track of the longest valid word and, in case of a tie, choose the lexicographically smallest one.
+Optimized Approach:
+
+Sort the dictionary first by length in descending order and then lexicographically.
+Iterate through the sorted dictionary and check if each word can be formed from s.
+Time and Space Complexity
+Time Complexity:
+Brute force: O(n * m), where n is the length of the dictionary and m is the average length of the words.
+Optimized: O(n log n + n * m), where the sorting step is O(n log n).
+Space Complexity: O(1) for extra space used.
+Implementation
+Brute Force Solution
+python
+Copy code
+def can_form(word, s):
+    """Check if the word can be formed from s by deleting some characters."""
+    it = iter(s)
+    return all(char in it for char in word)
+
+def longest_word_brute_force(s, dictionary):
+    """Find the longest word in the dictionary that can be formed from s."""
+    longest_word = ""
+    
+    for word in dictionary:
+        if can_form(word, s):
+            # Check if this word is longer or lexicographically smaller
+            if (len(word) > len(longest_word)) or (len(word) == len(longest_word) and word < longest_word):
+                longest_word = word
+    
+    return longest_word
+
+# Example usage
+s1 = "abpcplea"
+dictionary1 = ["ale", "apple", "monkey", "plea"]
+print(longest_word_brute_force(s1, dictionary1))  # Output: "apple"
+
+s2 = "abpcplea"
+dictionary2 = ["a", "b", "c"]
+print(longest_word_brute_force(s2, dictionary2))  # Output: "a"
+Optimized Solution
+python
+Copy code
+def can_form(word, s):
+    """Check if the word can be formed from s by deleting some characters."""
+    it = iter(s)
+    return all(char in it for char in word)
+
+def longest_word_optimized(s, dictionary):
+    """Find the longest word in the dictionary that can be formed from s."""
+    # Sort dictionary by length (descending) and lexicographically
+    dictionary.sort(key=lambda x: (-len(x), x))
+    
+    for word in dictionary:
+        if can_form(word, s):
+            return word  # Return the first longest word found
+    
+    return ""
+
+# Example usage
+s1 = "abpcplea"
+dictionary1 = ["ale", "apple", "monkey", "plea"]
+print(longest_word_optimized(s1, dictionary1))  # Output: "apple"
+
+s2 = "abpcplea"
+dictionary2 = ["a", "b", "c"]
+print(longest_word_optimized(s2, dictionary2))  # Output: "a"
+Explanation of the Code
+Function can_form(word, s):
+
+This helper function checks if word can be formed by deleting characters from s.
+It uses an iterator for s and checks if all characters in word can be found in s in order.
+Function longest_word_brute_force(s, dictionary):
+
+Initializes longest_word as an empty string.
+Iterates through each word in the dictionary.
+For each word, checks if it can be formed from s.
+Updates longest_word if the current word is longer or lexicographically smaller than the current longest_word.
+Function longest_word_optimized(s, dictionary):
+
+Sorts the dictionary first by length (in descending order) and then lexicographically.
+Iterates through the sorted dictionary and returns the first word that can be formed from s.
+This approach ensures that we find the longest and, in case of ties, the lexicographically smallest word efficiently.
+Example Usage:
+
+Two examples are provided to demonstrate how the function works with the given inputs.
+This structured approach allows us to effectively find the longest uncommon subsequence while maintaining clarity and efficiency in our solution.
