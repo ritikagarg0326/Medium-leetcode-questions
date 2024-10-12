@@ -1,0 +1,180 @@
+Guess Number Higher or Lower II
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (49.94%)	2178	2131
+Tags
+dynamic-programming | minimax
+
+Companies
+We are playing the Guessing Game. The game will work as follows:
+
+I pick a number between 1 and n.
+You guess a number.
+If you guess the right number, you win the game.
+If you guess the wrong number, then I will tell you whether the number I picked is higher or lower, and you will continue guessing.
+Every time you guess a wrong number x, you will pay x dollars. If you run out of money, you lose the game.
+Given a particular n, return the minimum amount of money you need to guarantee a win regardless of what number I pick.
+
+ To solve the problem of finding the minimum amount of money needed to guarantee a win in the Guessing Game, we can approach it using both a brute force method and a dynamic programming optimization.
+
+Problem Understanding
+In this game, we need to minimize our maximum loss when guessing numbers between 1 and 
+𝑛
+n. For every guess, if it's wrong, we pay the amount we guessed, and we want to strategize our guesses to ensure that our total loss is minimized, even in the worst-case scenario.
+
+Brute Force Solution
+The brute force solution explores all possible guesses and their outcomes recursively. We will use a recursive function to simulate guessing each number and calculate the worst-case cost for each guess.
+
+Steps:
+For every number 
+𝑥
+x we guess in the range from 1 to 
+𝑛
+n:
+If 
+𝑥
+x is the correct number, the cost is 0.
+If 
+𝑥
+x is wrong, we check:
+The cost if the number is higher than 
+𝑥
+x.
+The cost if the number is lower than 
+𝑥
+x.
+The total cost for guessing 
+𝑥
+x will be 
+𝑥
+x plus the maximum of the costs from the higher and lower guesses.
+The result for 
+𝑛
+n will be the minimum of these maximum costs.
+Time Complexity:
+O(2^n): The recursive approach could lead to exponential time due to overlapping subproblems.
+Space Complexity:
+O(n): Space used by the recursion stack.
+Brute Force Code:
+python
+Copy code
+def get_money_amount_brute(n):
+    """Brute Force solution to find the minimum money needed to guarantee a win."""
+    def helper(start, end):
+        if start >= end:
+            return 0
+        min_cost = float('inf')
+        
+        # Try every number between start and end as a guess
+        for x in range(start, end + 1):
+            cost = x + max(helper(start, x - 1), helper(x + 1, end))
+            min_cost = min(min_cost, cost)
+        
+        return min_cost
+    
+    return helper(1, n)
+
+# Example usage
+print(get_money_amount_brute(10))  # Output: 16
+print(get_money_amount_brute(1))   # Output: 0
+print(get_money_amount_brute(2))   # Output: 1
+Optimized Solution Using Dynamic Programming
+To optimize the brute force solution, we can use dynamic programming to store already computed costs for specific ranges, which will prevent redundant calculations.
+
+Steps:
+Create a DP table where dp[i][j] represents the minimum cost needed to guess the number between 
+𝑖
+i and 
+𝑗
+j.
+Fill in the DP table:
+For each possible range 
+[
+𝑖
+,
+𝑗
+]
+[i,j]:
+Try every number 
+𝑥
+x in that range as a guess.
+Calculate the cost as before but use the DP table to retrieve precomputed costs instead of recalculating.
+The result will be found in dp[1][n].
+Time Complexity:
+O(n^3): Filling the DP table involves a nested loop for ranges and guesses.
+Space Complexity:
+O(n^2): For the DP table.
+Optimized Code:
+python
+Copy code
+def get_money_amount(n):
+    """Optimized solution using dynamic programming."""
+    dp = [[0] * (n + 1) for _ in range(n + 1)]
+    
+    # Fill the DP table
+    for length in range(2, n + 1):  # length of the range
+        for start in range(1, n - length + 2):  # starting point
+            end = start + length - 1  # end point
+            min_cost = float('inf')
+            
+            for x in range(start, end):
+                # The cost of guessing x
+                cost = x + max(dp[start][x - 1], dp[x + 1][end])
+                min_cost = min(min_cost, cost)
+                
+            dp[start][end] = min_cost
+    
+    return dp[1][n]
+
+# Example usage
+print(get_money_amount(10))  # Output: 16
+print(get_money_amount(1))   # Output: 0
+print(get_money_amount(2))   # Output: 1
+Explanation of the Optimized Code:
+DP Initialization: We create a 2D DP table initialized to 0. The size is 
+(
+𝑛
++
+1
+)
+×
+(
+𝑛
++
+1
+)
+(n+1)×(n+1) to accommodate ranges from 1 to 
+𝑛
+n.
+Filling the DP Table:
+We iterate through all possible lengths of the range.
+For each starting point of the range, we calculate the end based on the current length.
+We try each possible guess 
+𝑥
+x within that range and compute the cost based on the previously computed values in the DP table.
+The minimum cost for the range 
+[
+𝑠
+𝑡
+𝑎
+𝑟
+𝑡
+,
+𝑒
+𝑛
+𝑑
+]
+[start,end] is stored in dp[start][end].
+Final Result: The minimum cost needed to guarantee a win for the range 
+[
+1
+,
+𝑛
+]
+[1,n] is found in dp[1][n].
+Summary of Comparison:
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(2^n)	O(n)	Recursively explores all guesses and outcomes.
+Dynamic Programming	O(n^3)	O(n^2)	Uses memoization to avoid redundant calculations.
+The optimized solution is significantly more efficient, especially for larger values of 
+𝑛
+n, and is preferred in practice.
