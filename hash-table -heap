@@ -1,0 +1,137 @@
+Sort Characters By Frequency
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (73.10%)	8406	298
+Tags
+hash-table | heap
+
+Companies
+Given a string s, sort it in decreasing order based on the frequency of the characters. The frequency of a character is the number of times it appears in the string.
+
+Return the sorted string. If there are multiple answers, return any of them.
+
+ 
+
+Example 1:
+
+Input: s = "tree"
+Output: "eert"
+Explanation: 'e' appears twice while 'r' and 't' both appear once.
+So 'e' must appear before both 'r' and 't'. Therefore "eetr" is also a valid answer.
+To solve the "Sort Characters By Frequency" problem, we need to rearrange the characters in a string based on their frequency in descending order.
+
+Problem Breakdown
+Character Frequency: First, we need to count the frequency of each character in the string.
+Sorting: After counting the frequencies, we should sort the characters based on their frequencies.
+Constructing the Result: Finally, we will construct the resulting string based on the sorted frequencies.
+Brute Force Solution
+The brute force approach would involve counting the characters and then sorting them. This method is straightforward but may not be the most efficient.
+
+Steps:
+Count the frequency of each character.
+Sort the characters based on their frequencies.
+Build the result string by concatenating characters according to their frequencies.
+Time Complexity
+O(n log n): The sorting step dominates the time complexity, where 
+𝑛
+n is the length of the string.
+Space Complexity
+O(n): We need space for the frequency count and the output string.
+Brute Force Code Implementation
+python
+Copy code
+def frequencySort(s):
+    """Brute force solution to sort characters by frequency."""
+    if not s:
+        return ""
+    
+    # Step 1: Count frequency of each character
+    frequency_map = {}
+    for char in s:
+        if char in frequency_map:
+            frequency_map[char] += 1
+        else:
+            frequency_map[char] = 1
+            
+    # Step 2: Sort characters based on frequency
+    sorted_chars = sorted(frequency_map.items(), key=lambda item: item[1], reverse=True)
+    
+    # Step 3: Construct the result based on sorted frequencies
+    result = []
+    for char, freq in sorted_chars:
+        result.append(char * freq)  # Append the character 'freq' times
+    
+    return ''.join(result)
+
+# Example usage
+s = "tree"
+print(frequencySort(s))  # Output: "eert" or "eetr"
+Optimized Solution
+An optimized solution can be implemented using a heap to handle sorting more efficiently. We can leverage Python's heapq library to create a max heap.
+
+Steps:
+Count the frequency of each character using a hash map.
+Use a heap to efficiently sort the characters based on their frequencies.
+Construct the result string similarly to the brute force solution.
+Time Complexity
+O(n + k log k): Where 
+𝑛
+n is the length of the string and 
+𝑘
+k is the number of unique characters. The counting step is 
+𝑂
+(
+𝑛
+)
+O(n) and building the heap is 
+𝑂
+(
+𝑘
+log
+⁡
+𝑘
+)
+O(klogk).
+Space Complexity
+O(n): Same as before, for the frequency count and output string.
+Optimized Code Implementation
+python
+Copy code
+import heapq
+from collections import Counter
+
+def frequencySort(s):
+    """Optimized solution to sort characters by frequency using a heap."""
+    if not s:
+        return ""
+    
+    # Step 1: Count frequency of each character
+    frequency_map = Counter(s)  # Count frequencies in O(n)
+    
+    # Step 2: Use a heap to sort characters by frequency
+    # Create a max-heap based on the frequency
+    max_heap = [(-freq, char) for char, freq in frequency_map.items()]  # Negate freq for max-heap
+    heapq.heapify(max_heap)  # Convert list into a heap in O(k)
+    
+    # Step 3: Construct the result based on sorted frequencies
+    result = []
+    while max_heap:
+        freq, char = heapq.heappop(max_heap)  # Get the character with the highest frequency
+        result.append(char * -freq)  # Append the character (-freq) times
+    
+    return ''.join(result)
+
+# Example usage
+s = "tree"
+print(frequencySort(s))  # Output: "eert" or "eetr"
+Explanation of the Optimized Code
+Input Handling: We read the input string 
+𝑠
+s.
+Character Counting: We use Counter from the collections module to count the frequency of each character in a single pass.
+Max Heap Creation: We construct a max-heap from the frequency map, where we negate the frequencies to utilize Python's min-heap as a max-heap.
+Building the Result: We repeatedly pop characters from the heap, appending them to the result string based on their frequencies.
+Summary of Comparison
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(n log n)	O(n)	Loops through each character to count, then sorts based on frequency.
+Optimized	O(n + k log k)	O(n)	Counts character frequencies, then uses a heap to sort by frequency.
+Both approaches effectively sort the characters by frequency, but the optimized version improves efficiency in handling large inputs by minimizing the time spent on sorting operations.
