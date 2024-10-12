@@ -1,0 +1,164 @@
+Ones and Zeroes
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (48.02%)	5475	466
+Tags
+dynamic-programming
+
+Companies
+You are given an array of binary strings strs and two integers m and n.
+
+Return the size of the largest subset of strs such that there are at most m 0's and n 1's in the subset.
+
+A set x is a subset of a set y if all elements of x are also elements of y.
+
+ 
+
+Example 1:
+
+Input: strs = ["10","0001","111001","1","0"], m = 5, n = 3
+Output: 4
+Explanation: The largest subset with at most 5 0's and 3 1's is {"10", "0001", "1", "0"}, so the answer is 4.
+Other valid but smaller subsets include {"0001", "1"} and {"10", "1", "0"}.
+{"111001"} is an invalid subset because it contains 4 1's, greater than the maximum of 3.
+  To solve the "Ones and Zeroes" problem, we need to find the size of the largest subset of binary strings such that the subset contains at most 
+𝑚
+m zeros and 
+𝑛
+n ones.
+
+Problem Breakdown
+Count Zeros and Ones: For each binary string, count the number of zeros and ones.
+Subset Selection: Explore all possible subsets of the given binary strings and check if they meet the constraints of at most 
+𝑚
+m zeros and 
+𝑛
+n ones.
+Keep Track of the Maximum Size: Maintain a record of the size of the largest valid subset.
+Brute Force Solution
+The brute force approach involves generating all possible subsets of the binary strings and checking their counts of zeros and ones. This method can be inefficient, especially for larger inputs.
+
+Steps
+Generate all subsets using combinations.
+For each subset, count the total zeros and ones.
+Check if the counts are within the limits 
+𝑚
+m and 
+𝑛
+n.
+Keep track of the largest valid subset size.
+Time Complexity
+O(2^k \cdot k): Where 
+𝑘
+k is the length of strs. Generating all subsets takes 
+𝑂
+(
+2
+𝑘
+)
+O(2 
+k
+ ), and checking each subset's zeros and ones takes 
+𝑂
+(
+𝑘
+)
+O(k).
+Space Complexity
+O(k): Space used for the subset storage.
+Brute Force Code Implementation
+python
+Copy code
+from itertools import combinations
+
+def count_zeros_ones(s):
+    """Helper function to count zeros and ones in a string."""
+    return s.count('0'), s.count('1')
+
+def findMaxForm(strs, m, n):
+    """Brute force solution to find the largest subset of binary strings."""
+    max_size = 0
+    total_strings = len(strs)
+    
+    # Explore all subsets
+    for i in range(total_strings + 1):
+        for subset in combinations(strs, i):
+            total_zeros = total_ones = 0
+            
+            # Count total zeros and ones in this subset
+            for s in subset:
+                zeros, ones = count_zeros_ones(s)
+                total_zeros += zeros
+                total_ones += ones
+            
+            # Check if within limits
+            if total_zeros <= m and total_ones <= n:
+                max_size = max(max_size, len(subset))
+    
+    return max_size
+
+# Example usage
+strs = ["10", "0001", "111001", "1", "0"]
+m, n = 5, 3
+print(findMaxForm(strs, m, n))  # Output: 4
+Optimized Solution
+The optimized solution employs dynamic programming to reduce the complexity significantly. We use a 2D array to keep track of the maximum subset sizes we can form with given numbers of zeros and ones.
+
+Steps
+Initialize a 2D DP array where dp[i][j] represents the maximum size of the subset that can be formed with at most 
+𝑖
+i zeros and 
+𝑗
+j ones.
+Iterate through each string, and for each string, iterate backward through the DP array to update possible subset sizes.
+For each string, count its zeros and ones and update the DP values.
+Time Complexity
+O(k * m * n): Where 
+𝑘
+k is the length of strs, and 
+𝑚
+m and 
+𝑛
+n are the maximum limits for zeros and ones.
+Space Complexity
+O(m * n): For the DP table.
+Optimized Code Implementation
+python
+Copy code
+def findMaxForm(strs, m, n):
+    """Optimized dynamic programming solution to find the largest subset of binary strings."""
+    # Initialize the DP table
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    
+    for s in strs:
+        zeros, ones = count_zeros_ones(s)
+        
+        # Iterate backward to avoid overwriting values we still need to use
+        for i in range(m, zeros - 1, -1):
+            for j in range(n, ones - 1, -1):
+                dp[i][j] = max(dp[i][j], dp[i - zeros][j - ones] + 1)
+    
+    return dp[m][n]
+
+# Example usage
+strs = ["10", "0001", "111001", "1", "0"]
+m, n = 5, 3
+print(findMaxForm(strs, m, n))  # Output: 4
+Explanation of the Optimized Code
+Input Handling: Read the input binary strings and the limits 
+𝑚
+m and 
+𝑛
+n.
+DP Table Initialization: Create a 2D DP table to keep track of the maximum subset sizes for varying counts of zeros and ones.
+Counting Zeros and Ones: For each binary string, use the helper function to count its zeros and ones.
+DP Table Update: For each string, update the DP table backward, ensuring we do not overwrite values that are still needed for calculations.
+Final Result: The maximum subset size that can be formed with at most 
+𝑚
+m zeros and 
+𝑛
+n ones will be stored in dp[m][n].
+Summary of Comparison
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(2^k \cdot k)	O(k)	Generates all subsets and checks their counts of zeros and ones.
+Optimized	O(k * m * n)	O(m * n)	Uses dynamic programming to efficiently compute maximum subset sizes.
+The optimized solution significantly reduces the time complexity and is suitable for larger inputs, making it more efficient than the brute force method.
