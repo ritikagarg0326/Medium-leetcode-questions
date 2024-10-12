@@ -1,0 +1,160 @@
+Paint Fence
+There is a  fence with n posts, each post can be  painted with one of the k colors.
+
+You have to paint all the posts such that no more than two adjacent fence posts have the same color.
+
+Return the total number of ways you can paint the fence.
+
+Note:
+n and k are non-negative integers.
+
+Example:
+
+Input: n = 3, k = 2
+Output: 6
+  Problem Explanation:
+You are given n fence posts, and each post can be painted with one of k colors. The constraint is that no more than two adjacent fence posts can have the same color. Your task is to determine how many ways the fence can be painted under this condition.
+
+Brute Force Solution:
+In the brute force solution, we will try every possible combination of painting the n posts with k colors while ensuring that no more than two adjacent posts have the same color. We will recursively try all color combinations for each post and backtrack if the constraint is violated.
+
+Brute Force Code:
+python
+Copy code
+def count_ways_brute_force(n, k):
+    # Helper function to recursively count the number of valid ways
+    def helper(index, prev1, prev2):
+        # Base case: if all posts are painted, return 1
+        if index == n:
+            return 1
+
+        total_ways = 0
+        # Try all k colors for the current post
+        for color in range(1, k + 1):
+            # Check if the color does not violate the constraint
+            if color != prev1 or prev1 != prev2:
+                total_ways += helper(index + 1, color, prev1)
+
+        return total_ways
+
+    # Start with the first post and no previous colors
+    return helper(0, -1, -1)
+
+# Input handling
+n = int(input("Enter number of posts (n): "))
+k = int(input("Enter number of colors (k): "))
+
+# Brute force result
+result = count_ways_brute_force(n, k)
+print("Total ways (brute force):", result)
+Explanation:
+Base Case: If index == n, meaning all posts have been painted, we return 1 because this is one valid way to paint the fence.
+Recursion: For each post, we try every possible color (from 1 to k). If the current color does not violate the rule (i.e., it is not the same as the previous two colors), we recurse for the next post.
+Final Calculation: We accumulate the number of valid ways to paint all posts as we recursively check each possibility.
+Time Complexity:
+In the worst case, for each post, we have k color choices, and we do this for n posts. Therefore, the time complexity is 
+𝑂
+(
+𝑘
+𝑛
+)
+O(k 
+n
+ ), which is highly inefficient.
+Space Complexity:
+The recursion depth is n, and there are no additional data structures used except for the recursion stack. Therefore, the space complexity is 
+𝑂
+(
+𝑛
+)
+O(n).
+Optimized Solution (Dynamic Programming):
+The brute force solution has an exponential time complexity, so we need to optimize it using dynamic programming.
+
+Approach:
+Base Cases:
+
+For n = 1, the result is k because each post can be painted in any of the k colors.
+For n = 2, the result is k * k because both posts can be painted in any color independently, but no restrictions apply yet.
+Recursive Relation:
+
+If dp[i] represents the number of ways to paint i posts, then:
+If the last two posts are painted with different colors: We can paint the current post in any of the k-1 colors (since it cannot be the same as the previous one).
+If the last two posts are painted with the same color: We can only paint the current post in k-1 colors.
+Thus, we have two cases:
+Same: The number of ways to paint the last two posts with the same color.
+Diff: The number of ways to paint the last two posts with different colors.
+The recursive relation is:
+
+same[i] = diff[i-1]
+diff[i] = (diff[i-1] + same[i-1]) * (k-1)
+The total number of ways to paint i posts is same[i] + diff[i].
+Optimized Code:
+python
+Copy code
+def count_ways_dp(n, k):
+    if n == 0:
+        return 0
+    if n == 1:
+        return k
+
+    # Initialize variables for two cases: same and different
+    same = 0
+    diff = k
+
+    for i in range(2, n + 1):
+        prev_same = same
+        same = diff  # Case when the last two posts have the same color
+        diff = (diff + prev_same) * (k - 1)  # Case when the last two posts have different colors
+
+    return same + diff
+
+# Input handling
+n = int(input("Enter number of posts (n): "))
+k = int(input("Enter number of colors (k): "))
+
+# DP result
+result = count_ways_dp(n, k)
+print("Total ways (DP):", result)
+Explanation:
+Base Cases: We initialize for n=1 and n=2. If n == 1, the result is simply k. If n == 2, the result is k * k.
+Dynamic Programming Transition:
+Same: The number of ways to paint the last two posts with the same color is equal to the number of ways to paint the previous post with a different color.
+Diff: The number of ways to paint the last two posts with different colors is the sum of the previous post being painted with the same or different color, multiplied by k-1 because the current post must be painted in a different color.
+Final Calculation: The total number of ways to paint the fence is the sum of same and diff.
+Time Complexity:
+Time Complexity: 
+𝑂
+(
+𝑛
+)
+O(n), where n is the number of posts, because we are iterating over each post and updating the same and diff variables.
+Space Complexity: 
+𝑂
+(
+1
+)
+O(1) because we are using only a constant amount of space (two variables same and diff).
+Example Execution:
+Input:
+bash
+Copy code
+Enter number of posts (n): 3
+Enter number of colors (k): 2
+Output:
+bash
+Copy code
+Total ways (DP): 6
+Conclusion:
+The brute force solution recursively checks all possible ways to paint the posts but has an exponential time complexity, which makes it impractical for larger inputs.
+The dynamic programming solution is an optimized approach with 
+𝑂
+(
+𝑛
+)
+O(n) time complexity and 
+𝑂
+(
+1
+)
+O(1) space complexity, making it efficient even for large inputs.
