@@ -1,0 +1,177 @@
+Minimum Absolute Difference in BST
+Category	Difficulty	Likes	Dislikes
+algorithms	Easy (58.55%)	4435	231
+Tags
+Companies
+Given the root of a Binary Search Tree (BST), return the minimum absolute difference between the values of any two different nodes in the tree.
+
+Example 1: Input: root = [4,2,6,1,3]
+Output: 1
+To solve the problem of finding the minimum absolute difference between the values of any two different nodes in a Binary Search Tree (BST), we can approach it with both brute force and optimized solutions.
+
+Problem Overview
+Given the root of a BST, we need to return the minimum absolute difference between the values of any two nodes.
+
+Brute Force Solution
+Understanding the Brute Force Approach:
+
+Traverse the entire tree to collect all node values.
+Use two nested loops to compare each pair of values and calculate the absolute differences.
+Keep track of the minimum difference found.
+Time Complexity:
+
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ): We traverse all nodes to collect values, and then we compare each pair of values, which leads to 
+𝑛
+(
+𝑛
+−
+1
+)
+/
+2
+n(n−1)/2 comparisons.
+Space Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): To store the values of all nodes in a list.
+Optimized Solution
+Understanding the Optimized Approach:
+
+Since we are working with a BST, an in-order traversal will give us a sorted list of values.
+During the traversal, we can maintain a variable to keep track of the previous node's value and compute the difference with the current node's value on-the-fly.
+This avoids the need for nested loops.
+Time Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): We visit each node exactly once during the in-order traversal.
+Space Complexity:
+
+𝑂
+(
+ℎ
+)
+O(h): Where 
+ℎ
+h is the height of the tree (for the recursive call stack). In the worst case (unbalanced tree), it can be 
+𝑂
+(
+𝑛
+)
+O(n), but for a balanced tree, it is 
+𝑂
+(
+log
+⁡
+𝑛
+)
+O(logn).
+Full Code Implementation
+Now, let's implement both the brute force and optimized solutions in Python.
+
+python
+Copy code
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def collect_values(node, values):
+    """Helper function to collect values from the BST in a list."""
+    if node:
+        collect_values(node.left, values)
+        values.append(node.val)
+        collect_values(node.right, values)
+
+def get_minimum_difference_brute_force(root):
+    """Calculate the minimum absolute difference using brute force."""
+    values = []
+    collect_values(root, values)  # Collect all node values in a list
+    min_diff = float('inf')  # Initialize minimum difference to a large value
+
+    # Compare every pair of values to find the minimum difference
+    for i in range(len(values)):
+        for j in range(i + 1, len(values)):
+            diff = abs(values[i] - values[j])
+            min_diff = min(min_diff, diff)
+    
+    return min_diff
+
+def get_minimum_difference_optimized(root):
+    """Calculate the minimum absolute difference using in-order traversal."""
+    min_diff = float('inf')
+    prev_val = None
+
+    def inorder_traversal(node):
+        nonlocal min_diff, prev_val
+        if node is None:
+            return
+        
+        # Traverse left subtree
+        inorder_traversal(node.left)
+        
+        # Process current node
+        if prev_val is not None:
+            min_diff = min(min_diff, abs(node.val - prev_val))
+        prev_val = node.val  # Update previous value
+
+        # Traverse right subtree
+        inorder_traversal(node.right)
+
+    inorder_traversal(root)
+    return min_diff
+
+# Taking input
+def insert_into_bst(root, val):
+    """Helper function to insert a value into the BST."""
+    if not root:
+        return TreeNode(val)
+    if val < root.val:
+        root.left = insert_into_bst(root.left, val)
+    else:
+        root.right = insert_into_bst(root.right, val)
+    return root
+
+# Build the BST from input values
+root = None
+values = [4, 2, 6, 1, 3]  # Example input
+for value in values:
+    root = insert_into_bst(root, value)
+
+# Output results
+brute_force_result = get_minimum_difference_brute_force(root)
+print(f"Minimum absolute difference (brute force): {brute_force_result}")
+
+optimized_result = get_minimum_difference_optimized(root)
+print(f"Minimum absolute difference (optimized): {optimized_result}")
+Explanation of the Code
+TreeNode Class:
+
+This defines the structure of a node in the BST, which contains a value and pointers to left and right children.
+collect_values(node, values):
+
+A helper function that performs an in-order traversal of the BST, collecting the values into a list.
+get_minimum_difference_brute_force(root):
+
+This function collects all the values using collect_values and then calculates the minimum absolute difference using nested loops.
+get_minimum_difference_optimized(root):
+
+This function uses an in-order traversal while maintaining a prev_val variable to keep track of the last visited node's value, calculating the difference on-the-fly.
+Input Handling:
+
+A helper function insert_into_bst is provided to construct the BST from a list of values.
+The code builds a BST using example input and then computes the minimum absolute difference using both methods, printing the results.
+With this implementation, you can see how the brute force approach compares to the optimized solution, which takes advantage of the properties of a BST to reduce computation time significantly
