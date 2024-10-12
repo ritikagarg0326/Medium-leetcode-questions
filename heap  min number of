@@ -1,0 +1,260 @@
+Meeting Rooms II
+Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), find the minimum number of conference rooms required.
+
+Example 1:
+
+Input: [[0, 30],[5, 10],[15, 20]]
+Output: 2
+  Problem Breakdown:
+We are given a list of meeting time intervals where each interval is represented as [start, end]. Our goal is to find the minimum number of conference rooms required so that no two meetings overlap.
+
+Approach:
+Brute Force Approach:
+Overlap Detection:
+
+For each meeting, we can check if it overlaps with any other ongoing meetings.
+If there is an overlap, we need to assign a new room.
+Track ongoing meetings and their end times to know when rooms become available.
+Inefficiency:
+
+In this brute force approach, we would compare every meeting with every other meeting, which results in high time complexity.
+Optimized Approach:
+Sorting by Start and End Times:
+
+We can optimize by separating the start and end times of meetings and sorting them.
+Use two pointers or two lists to keep track of how many meetings are currently ongoing.
+Iterate through the sorted start times and check if the next meeting can reuse an available room (i.e., its start time is after the earliest end time of an ongoing meeting).
+Heap/Priority Queue:
+
+We can use a min-heap to efficiently track the earliest end time of ongoing meetings. This will help us quickly determine if the next meeting can use a room that becomes free.
+Time Complexity:
+Brute Force: 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ), where 
+𝑛
+n is the number of meetings. For each meeting, we compare it with every other meeting to check for overlaps.
+Optimized: 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn), where 
+𝑛
+n is the number of meetings. Sorting the start and end times takes 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn), and managing the heap is 
+𝑂
+(
+log
+⁡
+𝑛
+)
+O(logn) for each meeting.
+Space Complexity:
+Brute Force: 
+𝑂
+(
+𝑛
+)
+O(n), to store ongoing meetings and their end times.
+Optimized: 
+𝑂
+(
+𝑛
+)
+O(n), for the min-heap to store end times.
+Optimized Code Implementation:
+python
+Copy code
+import heapq
+
+def min_meeting_rooms(intervals):
+    """
+    Determines the minimum number of meeting rooms required.
+    
+    :param intervals: List of intervals where each interval is represented as [start, end].
+    :return: The minimum number of rooms required.
+    """
+    
+    if not intervals:
+        return 0
+    
+    # Sort the intervals by the start times
+    intervals.sort(key=lambda x: x[0])
+    
+    # Min-heap to track the earliest end time of meetings
+    heap = []
+    
+    # Add the end time of the first meeting to the heap
+    heapq.heappush(heap, intervals[0][1])
+    
+    # Iterate over the rest of the intervals
+    for i in range(1, len(intervals)):
+        # If the current meeting starts after the earliest meeting in the heap ends
+        if intervals[i][0] >= heap[0]:
+            # Remove the earliest ending meeting
+            heapq.heappop(heap)
+        
+        # Add the current meeting's end time to the heap
+        heapq.heappush(heap, intervals[i][1])
+    
+    # The size of the heap tells us the minimum number of rooms required
+    return len(heap)
+
+# Input handling and driver code
+def main():
+    # Example input
+    intervals = [[0, 30], [5, 10], [15, 20]]
+    
+    # Calculate and print the result
+    result = min_meeting_rooms(intervals)
+    print("Minimum number of meeting rooms required:", result)
+
+if __name__ == "__main__":
+    main()
+Explanation of Code:
+Function min_meeting_rooms(intervals):
+
+If the input is empty, return 0 since no rooms are needed.
+First, we sort the intervals by their start time. This allows us to process meetings in chronological order.
+Heap Initialization:
+
+A min-heap is used to keep track of the ongoing meetings' end times. The heap will always store the meeting that finishes the earliest at the root.
+Initially, we push the end time of the first meeting into the heap.
+Iterating Over Intervals:
+
+For each subsequent meeting, we check if it starts after the earliest meeting in the heap has finished. If it does, we can reuse the room, so we remove the earliest ending meeting from the heap.
+Whether we remove a meeting or not, we push the current meeting's end time into the heap.
+Result:
+
+The size of the heap at the end of the iteration represents the minimum number of rooms required. Each entry in the heap corresponds to an ongoing meeting, which needs a separate room.
+Time Complexity:
+
+Sorting the intervals takes 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn).
+Pushing and popping from the heap takes 
+𝑂
+(
+log
+⁡
+𝑛
+)
+O(logn) for each of the 
+𝑛
+n intervals.
+Thus, the total time complexity is 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn).
+Space Complexity:
+
+The heap stores up to 
+𝑛
+n end times in the worst case, so the space complexity is 
+𝑂
+(
+𝑛
+)
+O(n).
+Example Execution:
+bash
+Copy code
+Minimum number of meeting rooms required: 2
+Brute Force Approach:
+If we want to implement the brute force approach, we would:
+
+Compare each meeting interval with all other intervals.
+Track the number of overlaps at any given time and count how many rooms we need.
+python
+Copy code
+def brute_force_min_meeting_rooms(intervals):
+    """
+    Brute force approach to find the minimum number of meeting rooms required.
+    """
+    if not intervals:
+        return 0
+    
+    # Track the maximum number of overlapping meetings
+    max_rooms = 0
+    
+    # Iterate through each meeting
+    for i in range(len(intervals)):
+        # Count how many meetings overlap with intervals[i]
+        rooms = 1
+        for j in range(i + 1, len(intervals)):
+            if intervals[j][0] < intervals[i][1] and intervals[i][0] < intervals[j][1]:
+                rooms += 1
+        
+        max_rooms = max(max_rooms, rooms)
+    
+    return max_rooms
+
+def main_brute_force():
+    intervals = [[0, 30], [5, 10], [15, 20]]
+    result = brute_force_min_meeting_rooms(intervals)
+    print("Brute force - Minimum number of meeting rooms required:", result)
+
+if __name__ == "__main__":
+    main_brute_force()
+Brute Force Time and Space Complexity:
+Time Complexity: 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ) because for each meeting, we compare it with every other meeting.
+Space Complexity: 
+𝑂
+(
+1
+)
+O(1) since no additional data structures are used beyond counting overlaps.
+Conclusion:
+The optimized solution using a min-heap significantly reduces the time complexity to 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn), making it efficient for larger inputs.
+The brute force solution checks every pair of meetings, leading to 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ) time complexity, which is inefficient for larger inputs but useful for understanding the core logic of overlapping intervals.
