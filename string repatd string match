@@ -1,0 +1,176 @@
+Repeated String Match
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (35.67%)	2592	986
+Tags
+string
+
+Companies
+Given two strings a and b, return the minimum number of times you should repeat string a so that string b is a substring of it. If it is impossible for b​​​​​​ to be a substring of a after repeating it, return -1.
+
+Notice: string "abc" repeated 0 times is "", repeated 1 time is "abc" and repeated 2 times is "abcabc".
+
+ 
+
+Example 1:
+
+Input: a = "abcd", b = "cdabcdab"
+Output: 3
+Explanation: We return 3 because by repeating a three times "abcdabcdabcd", b is a substring of it.
+To solve the problem of determining how many times we need to repeat string a so that string b becomes a substring of the repeated string, we can implement both a brute force approach and an optimized approach. Here’s a detailed explanation of each method, including time and space complexity, followed by the complete code implementation.
+
+Problem Overview
+We need to find the minimum number of times string a should be repeated such that string b is a substring of the resulting string. If it’s not possible, we should return -1.
+
+Brute Force Solution
+Understanding the Brute Force Approach:
+
+We can continuously concatenate string a until its length is greater than or equal to the length of string b.
+After each concatenation, we check if string b is a substring of the current repeated string.
+Time Complexity:
+
+The time complexity can be approximated as 
+𝑂
+(
+𝑛
+⋅
+𝑚
+)
+O(n⋅m), where 
+𝑛
+n is the length of a and 
+𝑚
+m is the number of times a is repeated (which can go up to 
+𝑚
++
+𝑛
+𝑛
+n
+m+n
+​
+ ).
+Space Complexity:
+
+The space complexity is 
+𝑂
+(
+𝑚
+⋅
+𝑛
+)
+O(m⋅n), where 
+𝑚
+m is the total length of the repeated string.
+Optimized Solution
+Understanding the Optimized Approach:
+
+Instead of repeatedly concatenating a, we can determine the number of times a needs to be repeated using a more mathematical approach.
+Calculate how many repetitions of a are required to ensure that its length is at least the length of b.
+We can stop once the repeated string has a length that is at least the length of b plus the length of a (to accommodate any overlap).
+Detailed Steps:
+
+Determine the minimum number of times to repeat a to cover the length of b.
+Concatenate a that many times and check if b is a substring.
+If not found, concatenate one more time and check again (to account for possible overlap).
+Time Complexity:
+
+The time complexity is 
+𝑂
+(
+𝑛
+)
+O(n), where 
+𝑛
+n is the length of b, because we are primarily concerned with checking for substrings.
+Space Complexity:
+
+The space complexity is 
+𝑂
+(
+𝑛
+)
+O(n) for the resultant concatenated string.
+Full Code Implementation
+Here’s the complete Python code for both the brute force and optimized approaches:
+
+python
+Copy code
+def repeatedStringMatchBruteForce(a, b):
+    """Brute force solution (inefficient for larger inputs)."""
+    repeated_a = a
+    count = 1
+    
+    while len(repeated_a) < len(b):
+        repeated_a += a
+        count += 1
+    
+    if b in repeated_a:
+        return count
+    
+    repeated_a += a  # One more time to check the overlap
+    if b in repeated_a:
+        return count + 1
+    
+    return -1
+
+def repeatedStringMatchOptimized(a, b):
+    """Optimized solution using length calculations."""
+    len_a = len(a)
+    len_b = len(b)
+
+    # Calculate minimum number of times we need to repeat `a`
+    repeat_count = (len_b + len_a - 1) // len_a  # Ceiling of len_b / len_a
+    repeated_a = a * repeat_count
+    
+    # Check if `b` is a substring
+    if b in repeated_a:
+        return repeat_count
+
+    # Check one more repetition in case of overlap
+    repeated_a += a
+    if b in repeated_a:
+        return repeat_count + 1
+
+    return -1
+
+# Input handling
+def main():
+    # Example input
+    a = "abcd"
+    b = "cdabcdab"
+
+    print("Input Strings: a =", a, ", b =", b)
+    
+    # Brute Force Result
+    brute_force_result = repeatedStringMatchBruteForce(a, b)
+    print("Minimum Repeats (Brute Force):", brute_force_result)
+
+    # Optimized Result
+    optimized_result = repeatedStringMatchOptimized(a, b)
+    print("Minimum Repeats (Optimized):", optimized_result)
+
+if __name__ == "__main__":
+    main()
+Explanation of the Code
+Imports:
+
+No additional imports are required.
+Brute Force Function:
+
+repeatedStringMatchBruteForce(a, b):
+Initializes repeated_a as a and a counter count.
+While the length of repeated_a is less than b, it keeps appending a and increments the counter.
+After exceeding the length of b, it checks if b is a substring.
+It also checks one more concatenation to account for overlaps.
+Returns count or -1 if no valid configuration is found.
+Optimized Function:
+
+repeatedStringMatchOptimized(a, b):
+Calculates the required number of repetitions to ensure repeated_a is at least as long as b.
+Checks if b is a substring of the repeated string.
+Checks again after one more repetition for overlap.
+Returns the count or -1 if not found.
+main() Function:
+
+Provides example inputs and calls both functions, printing their results.
+Conclusion
+This implementation efficiently checks how many times string a needs to be repeated so that string b is a substring, using both brute force and optimized approaches. The brute force solution is straightforward but inefficient for larger inputs, while the optimized solution uses a mathematical approach for better performance.
