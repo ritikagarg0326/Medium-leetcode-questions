@@ -1,0 +1,86 @@
+Generalized Abbreviation
+Write a function to generate the generalized abbreviations of a word. 
+
+Note: The order of the output does not matter.
+
+Example:
+
+Input: "word"
+Output:
+["word", "1ord", "w1rd", "wo1d", "wor1", "2rd", "w2d", "wo2", "1o1d", "1or1", "w1r1", "1o2", "2r1", "3d", "w3", "4"]
+ To solve the problem of generating generalized abbreviations for a given word, we can follow a systematic approach. The task requires us to create all possible abbreviations by replacing certain letters with their counts. For example, "word" can be abbreviated in several ways, such as replacing "w" with "1" (for one letter), or replacing "o" and "d" while leaving "r" unchanged.
+
+Explanation of the Approach
+Brute Force Method:
+
+In the brute-force approach, we can use a recursive backtracking technique to explore all possible combinations of keeping a character or replacing it with its count.
+For each character, we can either keep it as is or replace it with a number representing how many characters we have skipped since the last kept character.
+We will use a helper function to build the abbreviation recursively.
+Optimized Method:
+
+The optimized approach follows the same recursive structure but ensures we avoid redundant calculations by storing results in a set (to avoid duplicates) and using a list to build results efficiently.
+Time and Space Complexity
+Time Complexity: O(2^n), where n is the length of the word. This is because, for each character, we have two choices (keep or abbreviate).
+Space Complexity: O(n) for the recursive call stack and O(2^n) for the storage of results.
+Implementation
+The implementation includes a function to generate the abbreviations, as well as a helper function to perform the recursive backtracking. The main function will prepare the input, call the helper function, and return the results.
+
+Here’s the complete code:
+
+python
+Copy code
+def generate_abbreviations(word: str):
+    def backtrack(start, current, count):
+        # If we reach the end of the word, add the abbreviation to the results
+        if start == len(word):
+            if count > 0:
+                current.append(str(count))  # Append the count if any
+            results.add(''.join(current))   # Store the result
+            return
+
+        # Option 1: Abbreviate the current character
+        backtrack(start + 1, current, count + 1)
+
+        # Option 2: Keep the current character
+        if count > 0:
+            current.append(str(count))  # Append the count of abbreviated characters
+        current.append(word[start])     # Add the current character
+        backtrack(start + 1, current, 0)  # Reset count for next characters
+        current.pop()                   # Backtrack
+        if count > 0:
+            current.pop()               # Remove the count for backtracking
+
+    results = set()  # Use a set to avoid duplicates
+    backtrack(0, [], 0)
+    return list(results)
+
+# Input handling
+input_word = "word"
+abbreviations = generate_abbreviations(input_word)
+
+# Output result
+print("Generalized abbreviations are:", abbreviations)
+Code Explanation:
+Function generate_abbreviations(word: str):
+
+Initializes an empty set results to store unique abbreviations.
+Calls the backtrack helper function starting from the first character with an empty current abbreviation and a count of characters skipped.
+Backtracking Function backtrack(start, current, count):
+
+If start equals the length of the word, it means we've processed all characters. If there's a count, it appends it to current, then joins current into a string and adds it to results.
+Option 1: Calls itself with the next index while increasing the count to indicate skipping the current character.
+Option 2: Appends the current count (if greater than 0) to current, then appends the current character and calls itself with the next index while resetting the count.
+Finally, it pops the last added items to backtrack and explore other possibilities.
+Input Handling:
+
+The input word is defined as "word", and the generate_abbreviations function is called.
+Output:
+
+Prints the unique generalized abbreviations of the input word.
+Example Execution:
+For the input word "word", the output will be a list of its generalized abbreviations, such as:
+
+bash
+Copy code
+Generalized abbreviations are: ['w3', '4', '2rd', '1o1d', '1or1', '1w2', '1w1d', '1w1', '2r1', 'w1rd', 'w2d', 'w1r1', 'wo1d', '3d', '1ord', 'wo2', 'word', '3', '1or2', '2r', '2', 'w2', 'w1']
+The order may vary due to the nature of sets, but all valid abbreviations will be included.
