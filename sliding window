@@ -1,0 +1,213 @@
+Longest Substring with At Most Two Distinct Characters
+Given a string s , find the length of the longest substring t  that contains at most 2 distinct characters.
+
+Example 1:
+
+Input: "eceba"
+Output: 3
+Explanation: t is "ece" which its length is 3.To solve the problem of finding the length of the longest substring with at most two distinct characters, we can implement both a brute force approach and an optimized sliding window approach.
+
+Problem Overview
+We are given a string s and need to find the length of the longest substring t such that t contains at most two distinct characters. The goal is to return the length of this substring.
+
+Brute Force Approach
+Understanding the Brute Force Approach:
+
+We can generate all possible substrings of the input string s and check for the ones with at most two distinct characters.
+For each valid substring, we track the maximum length.
+This approach will check all substrings, making it inefficient for larger input sizes.
+Steps:
+
+Generate all possible substrings of s.
+For each substring, check if it has at most two distinct characters.
+Keep track of the longest valid substring.
+Time Complexity:
+
+Generating all substrings takes 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ), where n is the length of s.
+Checking if each substring has at most two distinct characters can take 
+𝑂
+(
+𝑛
+)
+O(n).
+Overall time complexity: 
+𝑂
+(
+𝑛
+3
+)
+O(n 
+3
+ ).
+Space Complexity:
+
+The space complexity is 
+𝑂
+(
+𝑛
+)
+O(n) for storing temporary substrings.
+Optimized Sliding Window Approach
+Understanding the Sliding Window Approach:
+
+We can use a sliding window (two-pointer) technique to track the longest valid substring while maintaining a count of distinct characters.
+The idea is to expand the window by moving the right pointer, and shrink the window by moving the left pointer when more than two distinct characters are found.
+Steps:
+
+Initialize two pointers (left and right) representing the current window.
+Use a hashmap to keep track of character frequencies within the window.
+Move the right pointer to expand the window.
+If the number of distinct characters exceeds two, move the left pointer to shrink the window until there are only two distinct characters.
+Time Complexity:
+
+The time complexity is 
+𝑂
+(
+𝑛
+)
+O(n), where n is the length of the string because both pointers (left and right) traverse the string at most once.
+Space Complexity:
+
+The space complexity is 
+𝑂
+(
+1
+)
+O(1) since the hashmap size is limited to at most two distinct characters.
+Full Code Implementation
+Here’s the Python code for both the brute force and optimized solutions:
+
+python
+Copy code
+def longestSubstringTwoDistinctBruteForce(s):
+    """Brute force solution for finding the longest substring with at most two distinct characters."""
+    n = len(s)
+    max_len = 0
+
+    # Helper function to check if the substring has at most two distinct characters
+    def is_valid(sub):
+        return len(set(sub)) <= 2
+
+    # Try all possible substrings
+    for i in range(n):
+        for j in range(i + 1, n + 1):
+            substring = s[i:j]
+            if is_valid(substring):
+                max_len = max(max_len, len(substring))
+
+    return max_len
+
+def longestSubstringTwoDistinctOptimized(s):
+    """Optimized sliding window solution for finding the longest substring with at most two distinct characters."""
+    n = len(s)
+    if n < 3:
+        return n
+
+    # Dictionary to count the characters in the current window
+    char_count = {}
+    left = 0
+    max_len = 0
+
+    # Sliding window approach
+    for right in range(n):
+        char_count[s[right]] = char_count.get(s[right], 0) + 1
+
+        # Shrink the window if there are more than 2 distinct characters
+        while len(char_count) > 2:
+            char_count[s[left]] -= 1
+            if char_count[s[left]] == 0:
+                del char_count[s[left]]
+            left += 1
+
+        # Update the maximum length of the substring found
+        max_len = max(max_len, right - left + 1)
+
+    return max_len
+
+# Input handling
+def main():
+    # Example input
+    s = "eceba"
+    print("Input String:", s)
+    
+    # Brute Force Result
+    brute_force_result = longestSubstringTwoDistinctBruteForce(s)
+    print("Longest Substring Length (Brute Force):", brute_force_result)
+
+    # Optimized Result
+    optimized_result = longestSubstringTwoDistinctOptimized(s)
+    print("Longest Substring Length (Optimized):", optimized_result)
+
+if __name__ == "__main__":
+    main()
+Explanation of the Code
+Brute Force Function:
+
+longestSubstringTwoDistinctBruteForce(s):
+Generates all possible substrings using nested loops.
+For each substring, the helper function is_valid(sub) checks if there are at most two distinct characters.
+Updates max_len if a valid substring is found.
+Optimized Sliding Window Function:
+
+longestSubstringTwoDistinctOptimized(s):
+Uses a sliding window technique to track the current valid window with at most two distinct characters.
+A hashmap char_count is used to keep track of the frequency of characters in the window.
+Expands the window by moving the right pointer and shrinks it when the number of distinct characters exceeds two.
+Updates max_len as it iterates through the string.
+main() Function:
+
+Provides example input "eceba".
+Calls both the brute force and optimized functions, printing the results.
+Time and Space Complexity
+Brute Force Approach:
+
+Time Complexity: 
+𝑂
+(
+𝑛
+3
+)
+O(n 
+3
+ ) because we generate all substrings and check the distinct character count.
+Space Complexity: 
+𝑂
+(
+𝑛
+)
+O(n) for storing substrings.
+Optimized Approach:
+
+Time Complexity: 
+𝑂
+(
+𝑛
+)
+O(n) as the sliding window traverses the string once.
+Space Complexity: 
+𝑂
+(
+1
+)
+O(1) because the dictionary stores at most two distinct characters.
+Conclusion
+This solution efficiently solves the problem of finding the longest substring with at most two distinct characters using both brute force and optimized approaches. The brute force solution is simple but inefficient, while the sliding window approach is optimal with a time complexity of 
+𝑂
+(
+𝑛
+)
+O(n).
+
+
+
+
+
+
