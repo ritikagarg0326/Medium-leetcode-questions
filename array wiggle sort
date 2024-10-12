@@ -1,0 +1,159 @@
+Wiggle Sort
+Given an unsorted array nums, reorder it in-place such that nums[0] <= nums[1] >= nums[2] <= nums[3]....
+
+Example:
+
+Input: nums = [3,5,2,1,6,4]
+Output: One possible answer is [3,5,1,6,2,4]
+Problem Explanation:
+You are given an unsorted array nums. The goal is to reorder it such that it satisfies the condition:
+
+nums[0] <= nums[1] >= nums[2] <= nums[3]... That means the first element should be less than or equal to the second, the second should be greater than or equal to the third, and so on.
+For example, if the input is [3,5,2,1,6,4], a possible wiggle-sorted output could be [3,5,1,6,2,4].
+
+Brute Force Solution:
+A brute force solution can involve sorting the array and then rearranging the elements to satisfy the wiggle sort property.
+
+Brute Force Approach:
+Sort the array: Sorting the array will give us a simple way to alternate between larger and smaller elements.
+Rearrange the elements: After sorting, we can manually rearrange them to satisfy the wiggle sort condition.
+Brute Force Code:
+python
+Copy code
+def wiggle_sort_brute_force(nums):
+    # Sort the array
+    nums.sort()
+    
+    # Rearrange the array to satisfy the condition
+    for i in range(1, len(nums) - 1, 2):
+        nums[i], nums[i + 1] = nums[i + 1], nums[i]
+
+# Input handling
+nums = list(map(int, input("Enter the numbers separated by space: ").split()))
+
+# Call the brute force solution
+wiggle_sort_brute_force(nums)
+
+# Output result
+print("Wiggle sorted array (brute force):", nums)
+Explanation of the Brute Force Code:
+Sorting: The array is first sorted. Sorting gives us a sequence of numbers in increasing order.
+Swapping: We then swap every second element with the next element. This ensures that the alternating pattern of <= and >= is satisfied.
+Time Complexity:
+Sorting: Sorting the array takes 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn).
+Rearranging: Swapping elements in pairs takes 
+𝑂
+(
+𝑛
+)
+O(n). So, the total time complexity is 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn).
+Space Complexity:
+Sorting the array happens in-place, and rearranging is also done in-place. Therefore, the space complexity is 
+𝑂
+(
+1
+)
+O(1).
+Optimized Solution:
+An optimized approach can achieve wiggle sort in 
+𝑂
+(
+𝑛
+)
+O(n) time by directly rearranging the elements without the need to sort the array.
+
+Optimized Approach:
+Iterate over the array: Traverse the array, and for every even index i, if nums[i] > nums[i+1], swap them. For every odd index i, if nums[i] < nums[i+1], swap them.
+This ensures that the alternating pattern is maintained.
+Optimized Code:
+python
+Copy code
+def wiggle_sort_optimized(nums):
+    for i in range(len(nums) - 1):
+        if (i % 2 == 0 and nums[i] > nums[i + 1]) or (i % 2 == 1 and nums[i] < nums[i + 1]):
+            # Swap the elements if the condition is violated
+            nums[i], nums[i + 1] = nums[i + 1], nums[i]
+
+# Input handling
+nums = list(map(int, input("Enter the numbers separated by space: ").split()))
+
+# Call the optimized solution
+wiggle_sort_optimized(nums)
+
+# Output result
+print("Wiggle sorted array (optimized):", nums)
+Explanation of the Optimized Code:
+Iterating through the array: We traverse the array from the start to the second-last element.
+Conditions:
+For even indices (i % 2 == 0), we ensure nums[i] <= nums[i+1]. If nums[i] > nums[i+1], we swap them.
+For odd indices (i % 2 == 1), we ensure nums[i] >= nums[i+1]. If nums[i] < nums[i+1], we swap them.
+Swapping: This guarantees that the <= and >= conditions are met for all pairs.
+Time Complexity:
+The entire array is traversed once, so the time complexity is 
+𝑂
+(
+𝑛
+)
+O(n).
+Space Complexity:
+The swaps are done in-place, so the space complexity is 
+𝑂
+(
+1
+)
+O(1).
+Example Execution:
+Input:
+bash
+Copy code
+Enter the numbers separated by space: 3 5 2 1 6 4
+Output (Brute Force):
+bash
+Copy code
+Wiggle sorted array (brute force): [3, 5, 1, 6, 2, 4]
+Output (Optimized):
+bash
+Copy code
+Wiggle sorted array (optimized): [3, 5, 1, 6, 2, 4]
+Conclusion:
+The brute force solution sorts the array and then rearranges elements to achieve the wiggle sort pattern. It has a time complexity of 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn) and a space complexity of 
+𝑂
+(
+1
+)
+O(1).
+The optimized solution achieves the same result in 
+𝑂
+(
+𝑛
+)
+O(n) time with 
+𝑂
+(
+1
+)
+O(1) space by iterating through the array and swapping elements based on index conditions.
