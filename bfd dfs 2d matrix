@@ -1,0 +1,161 @@
+01 Matrix
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (49.58%)	9655	427
+Tags
+depth-first-search | breadth-first-search
+
+Companies
+Given an m x n binary matrix mat, return the distance of the nearest 0 for each cell.
+
+The distance between two adjacent cells is 1.
+
+ To solve the problem of finding the distance to the nearest 0 for each cell in a binary matrix, we can start with a brute-force approach and then optimize it using a breadth-first search (BFS).
+
+Brute-Force Solution
+In the brute-force solution, for each cell that contains a 1, we will calculate the distance to the nearest cell that contains a 0. This is done by scanning the entire matrix for each 1, which leads to a time complexity of 
+𝑂
+(
+𝑚
+×
+𝑛
+×
+(
+𝑚
++
+𝑛
+)
+)
+O(m×n×(m+n)). Here’s a breakdown:
+
+Loop through each cell in the matrix.
+For each cell that is a 1, perform another nested loop to calculate the distance to each 0.
+Keep track of the minimum distance found.
+Time Complexity: 
+𝑂
+(
+𝑚
+×
+𝑛
+×
+(
+𝑚
++
+𝑛
+)
+)
+O(m×n×(m+n))
+Space Complexity: 
+𝑂
+(
+1
+)
+O(1) (if we modify the input matrix) or 
+𝑂
+(
+𝑚
+×
+𝑛
+)
+O(m×n) if we use a separate matrix for output.
+
+Optimized Solution (BFS)
+The optimized solution uses breadth-first search (BFS) starting from all the cells that contain 0. This allows us to calculate the distance for each cell in a single pass through the matrix. Here's how it works:
+
+Initialize a queue and add all positions of 0s to it.
+Create an output matrix initialized to a large number (infinity) to represent distances.
+For each cell popped from the queue, explore its neighbors (up, down, left, right).
+If the neighbor's distance can be updated (i.e., found a shorter path), update it and add the neighbor to the queue.
+Repeat until the queue is empty.
+Time Complexity: 
+𝑂
+(
+𝑚
+×
+𝑛
+)
+O(m×n)
+Space Complexity: 
+𝑂
+(
+𝑚
+×
+𝑛
+)
+O(m×n) (for the queue and output matrix).
+
+Full Code
+Now let's implement both the brute-force and optimized BFS solutions in Python:
+
+python
+Copy code
+from collections import deque
+
+def brute_force_distance(mat):
+    m, n = len(mat), len(mat[0])
+    output = [[float('inf')] * n for _ in range(m)]
+    
+    for i in range(m):
+        for j in range(n):
+            if mat[i][j] == 0:
+                output[i][j] = 0  # Distance to itself is zero
+            else:
+                # Search for nearest 0
+                for x in range(m):
+                    for y in range(n):
+                        if mat[x][y] == 0:
+                            distance = abs(i - x) + abs(j - y)
+                            output[i][j] = min(output[i][j], distance)
+    return output
+
+def bfs_distance(mat):
+    m, n = len(mat), len(mat[0])
+    output = [[float('inf')] * n for _ in range(m)]
+    queue = deque()
+    
+    # Initialize the queue with all the 0 positions
+    for i in range(m):
+        for j in range(n):
+            if mat[i][j] == 0:
+                queue.append((i, j))
+                output[i][j] = 0  # Distance to itself is zero
+
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # right, down, left, up
+    
+    while queue:
+        x, y = queue.popleft()
+        
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            
+            if 0 <= nx < m and 0 <= ny < n:
+                if output[nx][ny] > output[x][y] + 1:
+                    output[nx][ny] = output[x][y] + 1
+                    queue.append((nx, ny))
+    
+    return output
+
+# Example Input
+mat1 = [[0, 0, 0], [0, 1, 0], [0, 0, 0]]
+mat2 = [[0, 0, 0], [0, 1, 0], [1, 1, 1]]
+
+# Testing the functions
+print("Brute Force Output:")
+print(brute_force_distance(mat2))
+
+print("BFS Output:")
+print(bfs_distance(mat2))
+Explanation of the Code:
+Brute Force Function (brute_force_distance):
+
+Create an output matrix initialized to infinity.
+Loop through each cell; if it's 0, set the distance to 0.
+For each 1, loop through the entire matrix to find the nearest 0 and calculate the distance.
+BFS Function (bfs_distance):
+
+Create an output matrix initialized to infinity and a queue for BFS.
+Populate the queue with all positions of 0s, setting their distances to 0 in the output matrix.
+Use a while loop to explore each cell's neighbors. If a shorter distance is found, update the output matrix and add the neighbor to the queue.
+Both functions will output the matrix of distances as required. You can test with different inputs to see the results.
+
+
+
