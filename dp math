@@ -1,0 +1,120 @@
+Perfect Squares
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (55.13%)	11299	478
+Tags
+math | dynamic-programming | breadth-first-search
+
+Companies
+Given an integer n, return the least number of perfect square numbers that sum to n.
+
+A perfect square is an integer that is the square of an integer; in other words, it is the product of some integer with itself. For example, 1, 4, 9, and 16 are perfect squares while 
+3 and 11 are not.
+  To solve the problem of finding the least number of perfect square numbers that sum to n, we can approach it using a brute force method as well as an optimized dynamic programming solution.
+
+Brute Force Solution:
+The brute force solution involves checking all possible combinations of perfect squares that sum up to n. This solution can be modeled using recursion, where at each step we try subtracting all perfect squares from n and recursively check how many steps are required.
+
+Steps:
+Create a recursive function that reduces the input n by subtracting perfect square numbers (like 1, 4, 9, etc.).
+For each call, explore all possible perfect squares.
+Keep track of the minimum number of steps.
+Time Complexity:
+Exponential (O(2^n)): This solution explores all possible combinations recursively, leading to exponential time complexity.
+Space Complexity:
+O(n): The recursion stack could go as deep as n calls.
+Brute Force Code:
+
+import math
+
+def perfectSquaresBruteForce(n):
+    def dfs(remaining):
+        if remaining == 0:
+            return 0
+        min_count = float('inf')
+        for i in range(1, int(math.sqrt(remaining)) + 1):
+            square = i * i
+            min_count = min(min_count, 1 + dfs(remaining - square))
+        return min_count
+
+    return dfs(n)
+
+# Example usage
+n = 12
+print(perfectSquaresBruteForce(n))  # Output: 3
+Optimized Solution using Dynamic Programming:
+To optimize this problem, we can use dynamic programming (DP). The idea is to build a solution from the bottom up, storing the results of subproblems to avoid recomputation.
+
+Steps:
+Create a dp array where dp[i] represents the minimum number of perfect squares that sum to i.
+Initialize dp[0] to 0 (since 0 can be achieved by using no squares).
+For each i from 1 to n, try all perfect squares less than or equal to i, and update dp[i] with the minimum value found.
+Finally, dp[n] will contain the least number of perfect squares that sum to n.
+Time Complexity:
+O(n * sqrt(n)): We iterate through all numbers from 1 to n, and for each number, we check all perfect squares up to that number.
+Space Complexity:
+O(n): We need an array dp of size n+1.
+Optimized Code:
+
+import math
+
+def perfectSquaresDP(n):
+    # Create a dp array where dp[i] is the least number of squares that sum to i
+    dp = [float('inf')] * (n + 1)
+    dp[0] = 0  # Base case: 0 can be represented by 0 numbers
+    
+    # Iterate over all numbers from 1 to n
+    for i in range(1, n + 1):
+        # Try all squares less than or equal to i
+        for j in range(1, int(math.sqrt(i)) + 1):
+            square = j * j
+            dp[i] = min(dp[i], dp[i - square] + 1)
+    
+    return dp[n]
+
+# Example usage
+n = 12
+print(perfectSquaresDP(n))  # Output: 3
+
+n = 13
+print(perfectSquaresDP(n))  # Output: 2
+Explanation of Optimized Solution:
+DP Initialization:
+
+dp[0] is set to 0 because no numbers are needed to represent 0.
+All other dp[i] values are initialized to infinity (inf) to represent that they are not yet computed.
+Iterating through numbers:
+
+We iterate through each number i from 1 to n.
+For each i, we attempt to subtract all possible perfect squares (like 1, 4, 9, etc.), updating dp[i] with the minimum number of perfect squares found.
+Finding the minimum:
+
+For each perfect square j*j that is less than or equal to i, we check how many numbers are required to represent i - j*j using dp[i - j*j].
+We add 1 to account for the square j*j itself and update dp[i] with the minimum value.
+Final Result:
+
+After processing all numbers from 1 to n, the value dp[n] contains the least number of perfect squares that sum to n.
+Example Walkthrough:
+Let’s walk through the example n = 12:
+
+Initialization:
+dp = [0, inf, inf, inf, ..., inf] (size 13).
+Filling the DP Array:
+For i = 1: dp[1] = 1 (since 1 is a perfect square).
+For i = 2: dp[2] = 2 (1 + 1).
+For i = 3: dp[3] = 3 (1 + 1 + 1).
+For i = 4: dp[4] = 1 (since 4 is a perfect square).
+For i = 5: dp[5] = 2 (4 + 1).
+For i = 6: dp[6] = 3 (4 + 1 + 1).
+For i = 7: dp[7] = 4 (4 + 1 + 1 + 1).
+For i = 8: dp[8] = 2 (4 + 4).
+For i = 9: dp[9] = 1 (since 9 is a perfect square).
+For i = 10: dp[10] = 2 (9 + 1).
+For i = 11: dp[11] = 3 (9 + 1 + 1).
+For i = 12: dp[12] = 3 (4 + 4 + 4).
+Result: The minimum number of perfect squares that sum to 12 is 3 (4 + 4 + 4).
+
+Comparison:
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(2^n)	O(n)	Explores all possible combinations recursively.
+Optimized (DP)	O(n * sqrt(n))	O(n)	Solves using dynamic programming in a bottom-up approach.
+The dynamic programming approach is much more efficient and scalable, making it suitable for large values of n (up to 10^4).
