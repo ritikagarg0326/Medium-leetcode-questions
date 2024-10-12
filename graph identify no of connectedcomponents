@@ -1,0 +1,121 @@
+Number of Connected Components in an Undirected Graph
+Given n nodes labeled from 0 to n - 1 and a list of undirected edges (each edge is a pair of nodes), write a function to find the number of connected components in an undirected graph.
+
+Example 1:
+
+Input: n = 5 and edges = [[0, 1], [1, 2], [3, 4]]
+
+     0          3
+     |          |
+     1 --- 2    4
+
+Output: 2
+To determine the number of connected components in an undirected graph, we can approach the problem using either a brute-force method or an optimized method. Below, I will explain both approaches, provide time and space complexity analysis, and then present the complete code for each method.
+
+Explanation of the Approach
+Brute Force Method:
+
+In the brute-force approach, we can use Depth-First Search (DFS) or Breadth-First Search (BFS) to explore each component of the graph.
+We will keep track of the visited nodes to ensure we don't count a node in multiple components.
+For each unvisited node, we perform a DFS/BFS to mark all reachable nodes as visited, and increment the count of connected components.
+Optimized Method:
+
+The optimized approach also uses DFS or BFS, but we structure our graph representation using an adjacency list.
+This method improves efficiency by avoiding redundant searches and ensures we only visit each node once.
+Time and Space Complexity
+Time Complexity: O(V + E), where V is the number of vertices (n) and E is the number of edges. This is because we need to visit each vertex and each edge once.
+Space Complexity: O(V) for the storage of the adjacency list and O(V) for the visited set in the DFS/BFS stack.
+Implementation
+Below is the complete code implementing both the brute-force and optimized solutions for finding the number of connected components in an undirected graph.
+
+python
+Copy code
+def count_connected_components_brute_force(n, edges):
+    # Create a graph representation using an adjacency list
+    graph = {i: [] for i in range(n)}
+    for edge in edges:
+        graph[edge[0]].append(edge[1])
+        graph[edge[1]].append(edge[0])
+
+    visited = set()  # Set to keep track of visited nodes
+    component_count = 0  # Counter for connected components
+
+    # Helper function for DFS
+    def dfs(node):
+        stack = [node]
+        while stack:
+            current = stack.pop()
+            for neighbor in graph[current]:
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    stack.append(neighbor)
+
+    # Iterate through all nodes
+    for i in range(n):
+        if i not in visited:
+            visited.add(i)  # Mark the current node as visited
+            dfs(i)  # Perform DFS to mark all connected nodes
+            component_count += 1  # Increment the connected component count
+
+    return component_count
+
+def count_connected_components_optimized(n, edges):
+    # Create a graph representation using an adjacency list
+    graph = {i: [] for i in range(n)}
+    for edge in edges:
+        graph[edge[0]].append(edge[1])
+        graph[edge[1]].append(edge[0])
+
+    visited = [False] * n  # List to keep track of visited nodes
+    component_count = 0  # Counter for connected components
+
+    # Helper function for DFS
+    def dfs(node):
+        visited[node] = True
+        for neighbor in graph[node]:
+            if not visited[neighbor]:
+                dfs(neighbor)
+
+    # Iterate through all nodes
+    for i in range(n):
+        if not visited[i]:
+            dfs(i)  # Perform DFS to mark all connected nodes
+            component_count += 1  # Increment the connected component count
+
+    return component_count
+
+# Input handling
+n = 5
+edges = [[0, 1], [1, 2], [3, 4]]
+
+# Brute Force Method
+brute_force_result = count_connected_components_brute_force(n, edges)
+print("Number of connected components (Brute Force):", brute_force_result)
+
+# Optimized Method
+optimized_result = count_connected_components_optimized(n, edges)
+print("Number of connected components (Optimized):", optimized_result)
+Code Explanation:
+Function count_connected_components_brute_force(n, edges):
+
+Graph Construction: Creates an adjacency list representation of the graph from the list of edges.
+DFS Function: Implements a depth-first search to traverse the graph and mark all reachable nodes from the starting node.
+Main Loop: Iterates over all nodes; if a node hasn't been visited, it starts a new DFS, marks it as visited, and increments the component count.
+Function count_connected_components_optimized(n, edges):
+
+Similar to the brute-force function but uses a list to track visited nodes instead of a set, optimizing space usage.
+It follows the same structure, using DFS to traverse the graph and count components.
+Input Handling:
+
+n and edges are defined based on the provided example.
+Output:
+
+Prints the number of connected components found by both methods.
+Example Execution:
+For the input with n = 5 and edges = [[0, 1], [1, 2], [3, 4]], both methods will output:
+
+plaintext
+Copy code
+Number of connected components (Brute Force): 2
+Number of connected components (Optimized): 2
+This indicates that there are two connected components in the graph as expected.
