@@ -1,0 +1,182 @@
+Find K Closest Elements
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (47.85%)	8307	723
+Tags
+binary-search
+
+Companies
+Given a sorted integer array arr, two integers k and x, return the k closest integers to x in the array. The result should also be sorted in ascending order.
+
+An integer a is closer to x than an integer b if:
+
+|a - x| < |b - x|, or
+|a - x| == |b - x| and a < b
+ 
+
+Example 1:
+
+Input: arr = [1,2,3,4,5], k = 4, x = 3
+
+Output: [1,2,3,4]
+To solve the problem of finding the k closest elements to x in a sorted array arr, we can approach it with both brute force and optimized methods. Below is a detailed explanation of both approaches, their complexities, and the full code.
+
+Problem Overview
+Given a sorted array arr, we need to find k closest integers to a given integer x. The criteria for closeness are defined by the absolute difference between the integers and x. In case of a tie, the smaller integer is preferred.
+
+Brute Force Solution
+Understanding the Brute Force Approach:
+
+We can iterate through the entire array and calculate the distance of each element from x.
+We can store these distances along with their corresponding values in a list.
+Finally, we can sort this list based on the distance and the integer value and select the first k elements.
+Time Complexity:
+
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn): Sorting the list takes 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn), where 
+𝑛
+n is the length of arr.
+Space Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): We need additional space to store distances and their corresponding elements.
+Optimized Solution
+Understanding the Optimized Approach:
+
+Since the array is sorted, we can use a two-pointer technique to find the closest elements.
+First, we can use binary search to find the closest index to x. From there, we can expand outward using two pointers to collect k closest elements.
+The two pointers will compare elements on both sides of the closest index to determine which elements to include in the result.
+Time Complexity:
+
+𝑂
+(
+𝑘
+)
+O(k): The binary search takes 
+𝑂
+(
+log
+⁡
+𝑛
+)
+O(logn) and the two-pointer approach takes 
+𝑂
+(
+𝑘
+)
+O(k).
+Space Complexity:
+
+𝑂
+(
+1
+)
+O(1): We are using a constant amount of extra space (excluding the output).
+Full Code Implementation
+Here's the complete Python implementation for both the brute force and optimized approaches:
+
+python
+Copy code
+from typing import List
+import bisect
+
+def findClosestElements_brute_force(arr: List[int], k: int, x: int) -> List[int]:
+    """Brute force solution to find k closest elements to x."""
+    # Calculate the distance from x for each element and create a list of tuples
+    distances = [(abs(num - x), num) for num in arr]
+    
+    # Sort by distance and then by value
+    distances.sort()
+    
+    # Extract the first k closest elements and sort them
+    closest_elements = sorted(num for _, num in distances[:k])
+    
+    return closest_elements
+
+def findClosestElements_optimized(arr: List[int], k: int, x: int) -> List[int]:
+    """Optimized solution to find k closest elements to x."""
+    # Find the index of the closest element to x
+    idx = bisect.bisect_left(arr, x)
+    
+    left, right = idx - 1, idx
+    result = []
+    
+    # While we haven't collected k elements
+    for _ in range(k):
+        if left < 0:  # No more elements on the left
+            result.append(arr[right])
+            right += 1
+        elif right >= len(arr):  # No more elements on the right
+            result.append(arr[left])
+            left -= 1
+        else:
+            # Compare elements on both sides
+            if abs(arr[left] - x) <= abs(arr[right] - x):
+                result.append(arr[left])
+                left -= 1
+            else:
+                result.append(arr[right])
+                right += 1
+    
+    # Return the result sorted in ascending order
+    return sorted(result)
+
+# Input handling
+def main():
+    # Example input
+    arr = [1, 2, 3, 4, 5]
+    k = 4
+    x = 3
+
+    print("Input Array:", arr)
+    print("k:", k)
+    print("x:", x)
+
+    # Brute Force Result
+    brute_force_result = findClosestElements_brute_force(arr, k, x)
+    print("Closest Elements (Brute Force):", brute_force_result)
+
+    # Optimized Result
+    optimized_result = findClosestElements_optimized(arr, k, x)
+    print("Closest Elements (Optimized):", optimized_result)
+
+if __name__ == "__main__":
+    main()
+Explanation of the Code
+Imports: We import List for type hinting and bisect for binary search operations.
+
+Brute Force Function:
+
+findClosestElements_brute_force(arr, k, x):
+Computes the absolute difference between each element and x.
+Stores these differences along with the original elements in a list of tuples.
+Sorts the list based on the first element (distance) and, in case of ties, the second element (value).
+Extracts the first k closest elements and sorts them before returning.
+Optimized Function:
+
+findClosestElements_optimized(arr, k, x):
+Uses binary search to find the position where x would fit in arr.
+Initializes two pointers, left and right, to the elements on either side of the found index.
+Uses a loop to collect k closest elements by comparing the distances of the elements at the left and right pointers.
+After collecting, the result is sorted and returned.
+main() Function:
+
+Provides an example input and calls both functions, printing their results.
+Conclusion
+This implementation efficiently finds the k closest integers to x in a sorted array using both brute force and optimized methods, allowing for a clearer understanding of how each method works in practice. The optimized approach is significantly more efficient for larger arrays due to its linear time complexity for collecting results after the binary search.
