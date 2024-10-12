@@ -1,0 +1,142 @@
+Beautiful Arrangement
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (64.33%)	3248	372
+Tags
+backtracking
+
+Companies
+Suppose you have n integers labeled 1 through n. A permutation of those n integers perm (1-indexed) is considered a beautiful arrangement if for every i (1 <= i <= n), 
+either of the following is true:
+
+perm[i] is divisible by i.
+i is divisible by perm[i].
+Given an integer n, return the number of the beautiful arrangements that you can construct.
+To solve the problem of counting the number of beautiful arrangements for a given integer 
+𝑛
+n, we can use a backtracking approach. The goal is to find all permutations of integers from 1 to 
+𝑛
+n that meet the criteria specified.
+
+Problem Breakdown
+Understanding the Problem:
+
+A beautiful arrangement is defined such that for each index 
+𝑖
+i (1-indexed), either:
+perm[i] is divisible by 
+𝑖
+i, or
+𝑖
+i is divisible by perm[i].
+We need to count how many such permutations exist.
+Brute Force Approach:
+
+Generate all permutations of the list [1, 2, ..., n].
+For each permutation, check if it satisfies the beautiful arrangement conditions.
+Count the valid permutations.
+Optimized Approach:
+
+Use backtracking to build the permutation and count valid arrangements as we go.
+This is more efficient because it avoids generating all permutations unnecessarily.
+Time and Space Complexity
+Time Complexity:
+Brute force: 
+𝑂
+(
+𝑛
+!
+)
+O(n!) due to generating all permutations.
+Optimized: Also 
+𝑂
+(
+𝑛
+!
+)
+O(n!), but with much lower constant factors since not all permutations are generated.
+Space Complexity:
+Brute force: 
+𝑂
+(
+𝑛
+)
+O(n) for the recursion stack in generating permutations.
+Optimized: 
+𝑂
+(
+𝑛
+)
+O(n) for storing the current arrangement.
+Implementation
+Brute Force Solution
+python
+Copy code
+from itertools import permutations
+
+def is_beautiful(permutation):
+    """Check if a given permutation is a beautiful arrangement."""
+    for i in range(1, len(permutation) + 1):
+        if not (permutation[i - 1] % i == 0 or i % permutation[i - 1] == 0):
+            return False
+    return True
+
+def count_beautiful_arrangements_brute_force(n):
+    """Count the number of beautiful arrangements using brute force."""
+    count = 0
+    for perm in permutations(range(1, n + 1)):
+        if is_beautiful(perm):
+            count += 1
+    return count
+
+# Example usage
+print(count_beautiful_arrangements_brute_force(2))  # Output: 2
+print(count_beautiful_arrangements_brute_force(1))  # Output: 1
+Optimized Solution
+python
+Copy code
+def count_beautiful_arrangements(n):
+    """Count the number of beautiful arrangements using backtracking."""
+    def backtrack(position, used):
+        """Backtrack through the positions to count arrangements."""
+        if position > n:
+            return 1  # Found a valid arrangement
+        
+        count = 0
+        for i in range(1, n + 1):
+            if not used[i] and (i % position == 0 or position % i == 0):
+                used[i] = True  # Mark this number as used
+                count += backtrack(position + 1, used)  # Recur to the next position
+                used[i] = False  # Backtrack and mark it as unused
+        
+        return count
+    
+    used = [False] * (n + 1)  # Track used numbers (1-indexed)
+    return backtrack(1, used)  # Start from position 1
+
+# Example usage
+print(count_beautiful_arrangements(2))  # Output: 2
+print(count_beautiful_arrangements(1))  # Output: 1
+Explanation of the Code
+Function is_beautiful(permutation):
+
+This helper function checks if a given permutation is a beautiful arrangement.
+It iterates over each index 
+𝑖
+i and checks if either condition holds for perm[i].
+Function count_beautiful_arrangements_brute_force(n):
+
+This function uses Python's itertools.permutations to generate all permutations of the list [1, 2, ..., n].
+It checks each permutation with the is_beautiful function and counts valid arrangements.
+Function count_beautiful_arrangements(n):
+
+This function implements the backtracking approach.
+The backtrack(position, used) function tries to fill each position from 1 to 
+𝑛
+n.
+It checks if the current number can be placed in the current position based on the beautiful arrangement conditions.
+If it can, it marks the number as used and recursively calls itself to fill the next position.
+If a valid arrangement is completed (when position > n), it returns 1, indicating a successful arrangement.
+Example Usage:
+
+Two examples are provided to demonstrate how the function works with the given inputs.
+By implementing both brute force and optimized solutions, we can see the difference in approach while ensuring clarity and correctness in counting the beautiful arrangements.
