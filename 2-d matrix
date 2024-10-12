@@ -1,0 +1,183 @@
+Lonely Pixel I
+Given a picture consisting of black and white pixels, find the number of black lonely pixels.
+
+The picture is represented by a 2D char array consisting of 'B' and 'W', which means black and white pixels respectively.
+
+A black lonely pixel is character 'B' that located at a specific position where the same row and same column don't have any other black pixels.
+
+Example:
+
+Input:
+[['W', 'W', 'B'],
+ ['W', 'B', 'W'],
+ ['B', 'W', 'W']]
+
+Output: 3
+Explanation: All the three 'B's are black lonely pixels.
+To solve the problem of finding the number of black lonely pixels in a 2D array of black and white pixels, we can employ both a brute force solution and an optimized solution.
+
+Problem Explanation
+A black lonely pixel is defined as a 'B' that does not have any other 'B's in its row or column. Our goal is to count all such lonely black pixels in the provided 2D character array.
+
+Approach
+Brute Force Method:
+
+For each 'B' found in the 2D array, check its entire row and its entire column to see if there are any other 'B's present.
+If no other 'B' is found in either the row or the column, count it as a lonely black pixel.
+Optimized Method:
+
+First, traverse the entire 2D array once to count the total number of 'B's in each row and each column.
+Then, traverse the array again to check each 'B'. If the count of 'B's in its row and column is exactly 1, it is a lonely pixel.
+Time and Space Complexity
+Brute Force Method:
+
+Time Complexity: 
+𝑂
+(
+𝑛
+×
+𝑚
+×
+(
+𝑛
++
+𝑚
+)
+)
+O(n×m×(n+m)) where 
+𝑛
+n is the number of rows and 
+𝑚
+m is the number of columns. This is because for each 'B', we check its row and column.
+Space Complexity: 
+𝑂
+(
+1
+)
+O(1) as we are using a constant amount of additional space.
+Optimized Method:
+
+Time Complexity: 
+𝑂
+(
+𝑛
+×
+𝑚
+)
+O(n×m) since we make two passes over the array (one for counting and another for checking lonely pixels).
+Space Complexity: 
+𝑂
+(
+𝑛
++
+𝑚
+)
+O(n+m) to store the counts of 'B's in each row and each column.
+Implementation
+Here’s the complete code for both methods:
+
+python
+Copy code
+def countLonelyPixelsBruteForce(picture):
+    if not picture:
+        return 0
+    
+    n = len(picture)
+    m = len(picture[0])
+    lonely_pixel_count = 0
+    
+    for i in range(n):
+        for j in range(m):
+            if picture[i][j] == 'B':
+                # Check row
+                row_has_other_B = any(picture[i][k] == 'B' for k in range(m) if k != j)
+                # Check column
+                col_has_other_B = any(picture[k][j] == 'B' for k in range(n) if k != i)
+                
+                if not row_has_other_B and not col_has_other_B:
+                    lonely_pixel_count += 1
+                    
+    return lonely_pixel_count
+
+def countLonelyPixelsOptimized(picture):
+    if not picture:
+        return 0
+    
+    n = len(picture)
+    m = len(picture[0])
+    
+    row_count = [0] * n
+    col_count = [0] * m
+    
+    # Count 'B's in each row and column
+    for i in range(n):
+        for j in range(m):
+            if picture[i][j] == 'B':
+                row_count[i] += 1
+                col_count[j] += 1
+                
+    lonely_pixel_count = 0
+    
+    # Check each 'B' to see if it's lonely
+    for i in range(n):
+        for j in range(m):
+            if picture[i][j] == 'B':
+                if row_count[i] == 1 and col_count[j] == 1:
+                    lonely_pixel_count += 1
+                    
+    return lonely_pixel_count
+
+# Input handling
+picture = [
+    ['W', 'W', 'B'],
+    ['W', 'B', 'W'],
+    ['B', 'W', 'W']
+]  # Change the input to test different cases
+
+# Call brute force method
+brute_force_result = countLonelyPixelsBruteForce(picture)
+print("Brute Force Result:", brute_force_result)
+
+# Call optimized method
+optimized_result = countLonelyPixelsOptimized(picture)
+print("Optimized Result:", optimized_result)
+Code Explanation
+Brute Force Method (countLonelyPixelsBruteForce):
+
+Input: A 2D list picture.
+Initialization: Check if the input is empty; if yes, return 0. Initialize lonely_pixel_count to keep track of lonely pixels.
+Nested Loop: Iterate through each element of the picture using two loops.
+If the current element is 'B', check its row and column for other 'B's using list comprehensions (any function).
+If neither the row nor the column has another 'B', increment lonely_pixel_count.
+Return: The total count of lonely pixels.
+Optimized Method (countLonelyPixelsOptimized):
+
+Input: A 2D list picture.
+Initialization: Check if the input is empty; if yes, return 0. Initialize row_count and col_count to count 'B's in each row and column.
+First Loop: Count the number of 'B's in each row and each column.
+Nested Loop: Iterate through the picture again.
+For each 'B', check if its corresponding row and column counts are both 1. If they are, increment lonely_pixel_count.
+Return: The total count of lonely pixels.
+Example Execution
+For the provided input:
+
+python
+Copy code
+picture = [
+    ['W', 'W', 'B'],
+    ['W', 'B', 'W'],
+    ['B', 'W', 'W']
+]
+The output will be:
+
+rust
+Copy code
+Brute Force Result: 3
+Optimized Result: 3
+Both methods indicate that there are 3 lonely black pixels in the picture.
+
+
+
+
+
+
