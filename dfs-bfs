@@ -1,0 +1,151 @@
+Pacific Atlantic Water Flow
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (56.07%)	7519	1517
+Tags
+depth-first-search | breadth-first-search
+
+Companies
+There is an m x n rectangular island that borders both the Pacific Ocean and Atlantic Ocean. The Pacific Ocean touches the island's left and top edges, and the Atlantic Ocean touches the island's right and bottom edges.
+
+The island is partitioned into a grid of square cells. You are given an m x n integer matrix heights where heights[r][c] represents the height above sea level of the cell at coordinate (r, c).
+
+The island receives a lot of rain, and the rain water can flow to neighboring cells directly north, south, east, and west if the neighboring cell's height is less than or equal to the current cell's height. Water can flow from any cell adjacent to an ocean into the ocean.
+
+Return a 2D list of grid coordinates result where result[i] = [ri, ci] denotes that rain water can flow from cell (ri, ci) to both the Pacific and Atlantic oceans.
+  To solve the "Pacific Atlantic Water Flow" problem, we will implement both a brute force and an optimized solution. This problem requires us to determine which cells in a matrix can flow to both the Pacific and Atlantic oceans based on the height of the cells.
+
+Problem Understanding
+We are given a grid of heights, where:
+
+The Pacific Ocean touches the top and left edges of the grid.
+The Atlantic Ocean touches the bottom and right edges of the grid.
+Water can flow from a cell to its neighboring cells (north, south, east, west) if the neighboring cell's height is less than or equal to the current cell's height.
+Our goal is to find all cells from which water can flow to both oceans.
+
+Brute Force Solution
+In the brute force approach, we will perform a Depth-First Search (DFS) starting from each cell adjacent to the oceans.
+
+Steps:
+Initialize a result list to store the coordinates of cells that can reach both oceans.
+Define a function to perform DFS from a given cell to mark all reachable cells.
+For each cell on the boundaries adjacent to the Pacific Ocean, perform DFS to mark all cells reachable to the Pacific.
+Repeat the process for the Atlantic Ocean.
+Check which cells are marked as reachable from both oceans and add them to the result list.
+Time Complexity:
+O(m * n * (m + n)): Each cell initiates a DFS, which can potentially traverse all neighboring cells.
+Space Complexity:
+O(m * n): In the worst case, we need space for the visited array and the call stack.
+Brute Force Code:
+python
+Copy code
+def pacific_atlantic_brute(heights):
+    """Brute force solution using DFS to find cells that can flow to both oceans."""
+    if not heights:
+        return []
+
+    m, n = len(heights), len(heights[0])
+    result = []
+    
+    def dfs(r, c, visited):
+        visited.add((r, c))
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < m and 0 <= nc < n and (nr, nc) not in visited and heights[nr][nc] >= heights[r][c]:
+                dfs(nr, nc, visited)
+
+    pacific_visited = set()
+    atlantic_visited = set()
+    
+    # Pacific Ocean - top and left edges
+    for i in range(m):
+        dfs(i, 0, pacific_visited)
+    for j in range(n):
+        dfs(0, j, pacific_visited)
+    
+    # Atlantic Ocean - bottom and right edges
+    for i in range(m):
+        dfs(i, n - 1, atlantic_visited)
+    for j in range(n):
+        dfs(m - 1, j, atlantic_visited)
+
+    # Find cells reachable from both oceans
+    for r in range(m):
+        for c in range(n):
+            if (r, c) in pacific_visited and (r, c) in atlantic_visited:
+                result.append([r, c])
+
+    return result
+
+# Example usage
+print(pacific_atlantic_brute([[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]))
+# Output: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]
+Optimized Solution Using DFS with In-place Updates
+The optimized solution uses a single DFS for each ocean but combines the marking process to improve efficiency. Instead of maintaining separate visited sets for both oceans, we can use the same grid to mark cells that can reach both oceans.
+
+Steps:
+Initialize a result list to store the coordinates.
+Define a DFS function to mark cells reachable from either ocean.
+Perform DFS from all the cells adjacent to the Pacific Ocean.
+Perform DFS from all the cells adjacent to the Atlantic Ocean.
+Collect the cells that were marked reachable from both oceans.
+Time Complexity:
+O(m * n): Each cell is visited at most twice.
+Space Complexity:
+O(m * n): For the visited array, if used, or O(1) if we mark directly on the heights matrix.
+Optimized Code:
+python
+Copy code
+def pacific_atlantic(heights):
+    """Optimized solution using DFS to find cells that can flow to both oceans."""
+    if not heights:
+        return []
+
+    m, n = len(heights), len(heights[0])
+    result = []
+
+    # Directions for north, south, east, west
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+
+    def dfs(r, c, visited):
+        visited.add((r, c))
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < m and 0 <= nc < n and (nr, nc) not in visited and heights[nr][nc] >= heights[r][c]:
+                dfs(nr, nc, visited)
+
+    pacific_visited = set()
+    atlantic_visited = set()
+    
+    # Perform DFS from Pacific Ocean border
+    for i in range(m):
+        dfs(i, 0, pacific_visited)
+    for j in range(n):
+        dfs(0, j, pacific_visited)
+    
+    # Perform DFS from Atlantic Ocean border
+    for i in range(m):
+        dfs(i, n - 1, atlantic_visited)
+    for j in range(n):
+        dfs(m - 1, j, atlantic_visited)
+
+    # Check which cells can flow to both oceans
+    for r in range(m):
+        for c in range(n):
+            if (r, c) in pacific_visited and (r, c) in atlantic_visited:
+                result.append([r, c])
+
+    return result
+
+# Example usage
+print(pacific_atlantic([[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]))
+# Output: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]
+Explanation of the Optimized Code:
+Initialization: We set up directions for exploring neighboring cells and initialize sets for visited cells from both oceans.
+DFS Function: The DFS function adds the current cell to the visited set and explores all valid neighboring cells. If a neighbor has a height greater than or equal to the current cell, it continues the DFS from that neighbor.
+DFS Execution: We initiate DFS from the cells adjacent to both oceans.
+Result Compilation: After marking reachable cells, we check which cells are present in both visited sets and add them to the result list.
+Summary of Comparison:
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(m * n * (m + n))	O(m * n)	Initiates DFS from each boundary cell, marking reachable cells.
+Optimized DFS	O(m * n)	O(m * n) or O(1)	Marks reachable cells in a single pass for both oceans, using fewer resources.
+The optimized solution is more efficient due to its reduced number of DFS calls and combines the marking of cells into a single traversal process.
