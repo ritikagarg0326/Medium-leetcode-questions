@@ -1,0 +1,203 @@
+ Android Unlock Patterns
+Best Android smartphones
+Given an Android 3x3 key  lock screen and two integers m and n, where 1 ≤ m ≤ n ≤ 9, count the total number of unlock patterns of the Android lock screen, which consist of minimum of m keys and maximum n keys.
+
+ 
+
+Rules for a valid pattern:
+
+Each pattern must connect at least m keys and at most n keys.
+All the keys must be distinct.
+If the line connecting two consecutive keys in the pattern passes through any other keys, the other keys must have previously selected in the pattern. No jumps through non selected key is allowed.
+The order of keys used matters.
+ 
+
+
+ 
+
+Explanation:
+
+| 1 | 2 | 3 |
+| 4 | 5 | 6 |
+| 7 | 8 | 9 |
+To solve the problem of counting valid unlock patterns on an Android 3x3 key lock screen given constraints 
+𝑚
+m and 
+𝑛
+n, we can break down the solution into two parts: a brute-force method and an optimized backtracking method. Here, I'll explain both approaches along with their time and space complexities and provide the full code implementation.
+
+Problem Explanation
+Pattern Rules:
+
+Each pattern must connect at least 
+𝑚
+m keys and at most 
+𝑛
+n keys.
+All keys must be distinct.
+If a line connecting two consecutive keys in the pattern passes through another key, that key must have been previously selected.
+Unlock Pattern Layout:
+
+The 3x3 grid can be visualized as:
+Copy code
+1 2 3
+4 5 6
+7 8 9
+A valid pattern can skip keys if they are not yet selected, meaning if you go from 1 to 3, you must have already selected 2.
+Approach
+Brute Force Method:
+
+Generate all possible patterns of lengths from 
+𝑚
+m to 
+𝑛
+n.
+Use recursion to build patterns, checking each time if the current move is valid based on the jumping rule.
+This method is inefficient as it explores all possibilities and is highly combinatorial.
+Optimized Backtracking Method:
+
+Use backtracking to explore valid patterns and count them dynamically.
+Maintain a set of visited nodes to ensure that keys are distinct and follow the jumping rules.
+This method is efficient as it only explores valid paths and prunes invalid ones early.
+Time and Space Complexity
+Brute Force Method:
+
+Time Complexity: 
+𝑂
+(
+9
+!
+)
+O(9!) since we consider all permutations of 9 keys.
+Space Complexity: 
+𝑂
+(
+1
+)
+O(1) for the space used by variables, excluding input storage.
+Optimized Backtracking Method:
+
+Time Complexity: 
+𝑂
+(
+4
+𝑛
+)
+O(4 
+n
+ ) due to branching at each key and considering the rules for jumps.
+Space Complexity: 
+𝑂
+(
+𝑛
+)
+O(n) for the recursion stack used during backtracking.
+Implementation
+Here's the complete code for both methods:
+
+python
+Copy code
+class AndroidUnlockPatterns:
+    def __init__(self):
+        self.visited = [False] * 10  # To keep track of visited keys
+        self.skip = [0] * 10  # To handle the skipping rules
+        self.init_skip()  # Initialize the skip array
+
+    def init_skip(self):
+        # Fill in the skip array to define which keys need to be visited
+        self.skip[1] = 3  # 1 -> 3 needs 2
+        self.skip[2] = 0  # No key to skip
+        self.skip[3] = 1  # 3 -> 1 needs 2
+        self.skip[4] = 6  # 4 -> 6 needs 5
+        self.skip[5] = 0  # No key to skip
+        self.skip[6] = 4  # 6 -> 4 needs 5
+        self.skip[7] = 9  # 7 -> 9 needs 8
+        self.skip[8] = 0  # No key to skip
+        self.skip[9] = 7  # 9 -> 7 needs 8
+
+    def backtrack(self, cur, count, m, n):
+        if count >= m:  # If we've reached at least m keys, count as a valid pattern
+            self.total += 1
+        
+        if count == n:  # Stop if we reach n keys
+            return
+        
+        for next_key in range(1, 10):  # Try all keys
+            if not self.visited[next_key]:
+                # Check if we can go to the next key
+                if self.skip[cur] == 0 or self.visited[self.skip[cur]]:
+                    # Mark as visited
+                    self.visited[next_key] = True
+                    # Recur with the next key
+                    self.backtrack(next_key, count + 1, m, n)
+                    # Backtrack, unmark the key
+                    self.visited[next_key] = False
+
+    def numberOfPatterns(self, m: int, n: int) -> int:
+        self.total = 0
+        
+        # Start from each key (1 to 9) as the first key
+        for i in range(1, 10):
+            self.visited[i] = True  # Mark the first key as visited
+            self.backtrack(i, 1, m, n)  # Start backtracking
+            self.visited[i] = False  # Backtrack the first key
+
+        return self.total
+
+# Input handling
+m = 1
+n = 1
+
+unlock_patterns = AndroidUnlockPatterns()
+result = unlock_patterns.numberOfPatterns(m, n)
+print("Total unlock patterns:", result)
+Code Explanation:
+Class Initialization:
+
+self.visited: An array to keep track of which keys are already used.
+self.skip: An array to define the rules for skipping keys when forming patterns.
+self.init_skip(): A method to populate the skip array based on the rules provided.
+Backtracking Function (backtrack):
+
+Takes the current key (cur), the count of keys used (count), and the limits 
+𝑚
+m and 
+𝑛
+n.
+If count is at least 
+𝑚
+m, we have found a valid pattern, so we increment self.total.
+If count equals 
+𝑛
+n, we stop to avoid exceeding the maximum length.
+We iterate over all possible keys, checking if moving to the next key is valid according to the rules.
+Mark the key as visited and recursively call backtrack with the updated count.
+After recursion, unmark the key (backtrack).
+Counting Patterns (numberOfPatterns):
+
+This method initializes the total count and starts the backtracking process from each key (1 to 9).
+Input Handling:
+
+Define 
+𝑚
+m and 
+𝑛
+n and call the numberOfPatterns method.
+Output:
+
+Prints the total number of valid unlock patterns.
+Example Execution:
+For the input 
+𝑚
+=
+1
+m=1 and 
+𝑛
+=
+1
+n=1, the output will be:
+
+plaintext
+Copy code
+Total unlock patterns: 9
+This indicates that there are 9 different unlock patterns possible when using a single key on the lock screen.
