@@ -1,0 +1,118 @@
+Problem Understanding:
+You are given an m x n matrix, where:
+
+Each row is sorted in ascending order (from left to right).
+Each column is sorted in ascending order (from top to bottom).
+You need to determine if a target integer exists in this matrix. The goal is to come up with an efficient search algorithm considering the constraints.
+
+Brute Force Solution:
+In the brute force approach, we can simply iterate over each element of the matrix and check if it matches the target. This approach checks every element, so the time complexity will be proportional to the size of the matrix.
+
+Time Complexity:
+O(m * n): We need to check every element in the matrix where m is the number of rows and n is the number of columns.
+Space Complexity:
+O(1): We are not using any extra space apart from a few variables.
+Steps:
+Traverse each element of the matrix using two nested loops.
+Compare each element with the target.
+If a match is found, return True.
+If no match is found after traversing the matrix, return False.
+Optimized Solution (Search from Top-Right Corner):
+We can improve the efficiency by leveraging the sorted nature of the matrix:
+
+Start the search from the top-right corner of the matrix.
+From there:
+If the current element is greater than the target, move left (since elements on the left will be smaller).
+If the current element is smaller than the target, move down (since elements below will be larger).
+This strategy eliminates rows and columns in each step, making it much more efficient.
+
+Time Complexity:
+O(m + n): In each step, we either move left or down, effectively eliminating either a row or a column.
+Space Complexity:
+O(1): We only use a constant amount of extra space for variables.
+Steps:
+Start from the top-right corner.
+While the current position is within bounds:
+If the current element equals the target, return True.
+If the current element is greater than the target, move left.
+If the current element is less than the target, move down.
+If we exit the loop without finding the target, return False.
+Brute Force Code:
+
+def searchMatrixBruteForce(matrix, target):
+    # Get the dimensions of the matrix
+    rows = len(matrix)
+    cols = len(matrix[0])
+
+    # Traverse each element in the matrix
+    for i in range(rows):
+        for j in range(cols):
+            # If we find the target, return True
+            if matrix[i][j] == target:
+                return True
+    
+    # If we finish traversal and haven't found the target, return False
+    return False
+
+# Example usage
+matrix = [
+    [1, 4, 7, 11, 15],
+    [2, 5, 8, 12, 19],
+    [3, 6, 9, 16, 22],
+    [10, 13, 14, 17, 24],
+    [18, 21, 23, 26, 30]
+]
+target = 5
+print(searchMatrixBruteForce(matrix, target))  # Output: True
+Optimized Code:
+
+def searchMatrixOptimized(matrix, target):
+    # Get the dimensions of the matrix
+    rows = len(matrix)
+    cols = len(matrix[0])
+
+    # Start from the top-right corner
+    row = 0
+    col = cols - 1
+
+    # Continue searching while the current position is within the matrix
+    while row < rows and col >= 0:
+        # If we find the target, return True
+        if matrix[row][col] == target:
+            return True
+        # If the current element is larger than target, move left
+        elif matrix[row][col] > target:
+            col -= 1
+        # If the current element is smaller than target, move down
+        else:
+            row += 1
+
+    # If we finish searching and haven't found the target, return False
+    return False
+
+# Example usage
+matrix = [
+    [1, 4, 7, 11, 15],
+    [2, 5, 8, 12, 19],
+    [3, 6, 9, 16, 22],
+    [10, 13, 14, 17, 24],
+    [18, 21, 23, 26, 30]
+]
+target = 5
+print(searchMatrixOptimized(matrix, target))  # Output: True
+Explanation of Optimized Solution:
+Starting Point:
+
+We start at the top-right corner of the matrix because this position allows us to decide whether to move left (if the value is greater than the target) or down (if the value is less than the target).
+Movement:
+
+If the current element is larger than the target, we move left because all the elements to the left are smaller.
+If the current element is smaller than the target, we move down because all the elements below are larger.
+Termination:
+
+We continue this process until we either find the target or move out of the bounds of the matrix.
+Comparison:
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(m * n)	O(1)	Checks each element one by one in the matrix.
+Optimized (Top-right)	O(m + n)	O(1)	Uses the sorted properties of the matrix to eliminate rows/columns in each step.
+The optimized solution is much more efficient, especially for larger matrices, as it takes advantage of the matrix's sorted structure to reduce unnecessary comparisons.
