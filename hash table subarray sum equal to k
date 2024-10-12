@@ -1,0 +1,138 @@
+Subarray Sum Equals K
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (44.14%)	22009	685
+Tags
+array | hash-table
+
+Companies
+Given an array of integers nums and an integer k, return the total number of subarrays whose sum equals to k.
+
+A subarray is a contiguous non-empty sequence of elements within an array.
+To solve the problem of finding the total number of contiguous subarrays that sum up to a given integer 
+𝑘
+k, we can start with a brute-force approach and then move on to an optimized solution using a hash table.
+
+Brute-Force Solution
+In the brute-force approach, we will generate all possible subarrays and check their sums. This involves:
+
+Using two nested loops: the outer loop will define the starting index of the subarray, and the inner loop will define the ending index.
+For each subarray defined by these indices, compute the sum and check if it equals 
+𝑘
+k.
+Time Complexity: 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ )
+Space Complexity: 
+𝑂
+(
+1
+)
+O(1) (if we do not count the output storage).
+
+Optimized Solution (Using Hash Map)
+The optimized solution uses a hash map (dictionary) to store the cumulative sums encountered as we iterate through the array. Here's the approach:
+
+Initialize a hash map to store cumulative sums and their frequencies, starting with {0: 1} to handle cases where a subarray starting from index 0 sums to 
+𝑘
+k.
+Maintain a cumulative sum variable that stores the sum of elements up to the current index.
+For each element, calculate the cumulative sum and check if the difference between the cumulative sum and 
+𝑘
+k has been seen before in the hash map.
+If it has, this means there are subarrays that sum to 
+𝑘
+k, so we add the frequency of that cumulative sum to our count.
+Time Complexity: 
+𝑂
+(
+𝑛
+)
+O(n)
+Space Complexity: 
+𝑂
+(
+𝑛
+)
+O(n) (in the worst case, we may store all cumulative sums).
+
+Full Code
+Here’s the implementation of both the brute-force and optimized solutions in Python:
+
+python
+Copy code
+def brute_force_subarray_sum(nums, k):
+    count = 0
+    n = len(nums)
+
+    # Loop through each possible starting point of subarray
+    for start in range(n):
+        current_sum = 0
+        # Loop through each possible ending point of subarray
+        for end in range(start, n):
+            current_sum += nums[end]
+            if current_sum == k:
+                count += 1  # Increment count if sum equals k
+
+    return count
+
+def optimized_subarray_sum(nums, k):
+    count = 0
+    cumulative_sum = 0
+    sum_count = {0: 1}  # Handle case when subarray from start sums to k
+
+    for num in nums:
+        cumulative_sum += num
+        # Check if (cumulative_sum - k) has been seen before
+        if (cumulative_sum - k) in sum_count:
+            count += sum_count[cumulative_sum - k]  # Add the frequency of that sum
+
+        # Update the count of the cumulative sum in the hash map
+        if cumulative_sum in sum_count:
+            sum_count[cumulative_sum] += 1
+        else:
+            sum_count[cumulative_sum] = 1
+
+    return count
+
+# Example Input
+nums1 = [1, 1, 1]
+k1 = 2
+nums2 = [1, 2, 3]
+k2 = 3
+
+# Testing the functions
+print("Brute Force Output:")
+print(brute_force_subarray_sum(nums1, k1))  # Output: 2
+
+print("Optimized Output:")
+print(optimized_subarray_sum(nums1, k1))  # Output: 2
+Explanation of the Code:
+Brute Force Function (brute_force_subarray_sum):
+
+Initialize a counter (count) to track the number of valid subarrays.
+Use nested loops to explore all subarrays:
+The outer loop sets the start index.
+The inner loop extends the end index and calculates the cumulative sum.
+If the cumulative sum equals 
+𝑘
+k, increment the count.
+Optimized Function (optimized_subarray_sum):
+
+Initialize a counter for the count of subarrays and a cumulative sum variable.
+Create a dictionary (sum_count) initialized with {0: 1} to handle cases where the subarray sum equals 
+𝑘
+k from the start.
+Iterate through each number in nums, updating the cumulative sum.
+Check if the difference between the cumulative sum and 
+𝑘
+k exists in sum_count. If it does, add the corresponding frequency to the count.
+Update the cumulative sum frequency in sum_count.
+Both functions will return the correct count of contiguous subarrays that sum to 
+𝑘
+k. You can test them with different input values to see the results.
