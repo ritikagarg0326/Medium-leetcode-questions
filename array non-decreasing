@@ -1,0 +1,206 @@
+Non-decreasing Array
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (24.86%)	5741	779
+Tags
+array
+
+Companies
+Given an array nums with n integers, your task is to check if it could become non-decreasing by modifying at most one element.
+
+We define an array is non-decreasing if nums[i] <= nums[i + 1] holds for every i (0-based) such that (0 <= i <= n - 2).
+
+ 
+
+Example 1:
+
+Input: nums = [4,2,3]
+Output: true
+Explanation: You could modify the first 4 to 1 to get a non-decreasing array.
+To determine if an array can become non-decreasing by modifying at most one element, we can explore both a brute force solution and an optimized approach. Below, I'll provide detailed explanations for both methods, including their time and space complexities, followed by the complete code implementation.
+
+Problem Overview
+An array is considered non-decreasing if for every index 
+𝑖
+i (from 0 to 
+𝑛
+−
+2
+n−2), the condition 
+nums
+[
+𝑖
+]
+≤
+nums
+[
+𝑖
++
+1
+]
+nums[i]≤nums[i+1] holds true. Our task is to check if we can achieve this condition by modifying at most one element in the array.
+
+Brute Force Solution
+Understanding the Brute Force Approach:
+
+We can iterate through each element in the array and try modifying it (to any possible value) and check if the modified array is non-decreasing.
+This approach generates a lot of unnecessary computations and is not efficient.
+Time Complexity:
+
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ): For each element, we could potentially check the entire array, leading to quadratic time complexity.
+Space Complexity:
+
+𝑂
+(
+1
+)
+O(1): No extra space is needed apart from a few variables for iteration.
+Optimized Solution
+Understanding the Optimized Approach:
+
+We can iterate through the array and track how many times we encounter a violation of the non-decreasing condition (i.e., when 
+nums
+[
+𝑖
+]
+>
+nums
+[
+𝑖
++
+1
+]
+nums[i]>nums[i+1]).
+If we find more than one violation, we cannot modify just one element to achieve a non-decreasing array.
+If we find one violation, we can attempt to fix it by adjusting either the element at 
+𝑖
+i or the element at 
+𝑖
++
+1
+i+1.
+Detailed Steps:
+
+Iterate through the array and count violations.
+If there are no violations, the array is already non-decreasing.
+If one violation occurs, we check if we can adjust the numbers around the violation to maintain the non-decreasing order.
+Time Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): We traverse the array only once.
+Space Complexity:
+
+𝑂
+(
+1
+)
+O(1): Only a few variables are used for tracking indices.
+Full Code Implementation
+Here’s the complete Python code for both the brute force and optimized approaches:
+
+python
+Copy code
+def checkPossibilityBruteForce(nums):
+    """Brute force solution (inefficient for larger inputs)."""
+    n = len(nums)
+    for i in range(n):
+        original_value = nums[i]
+        for j in range(-10**5, 10**5 + 1):
+            nums[i] = j
+            if all(nums[k] <= nums[k + 1] for k in range(n - 1)):
+                return True
+        nums[i] = original_value  # Restore original value
+    return False
+
+def checkPossibilityOptimized(nums):
+    """Optimized solution using a single pass through the array."""
+    count = 0  # Count of modifications needed
+    n = len(nums)
+    
+    for i in range(n - 1):
+        if nums[i] > nums[i + 1]:
+            count += 1
+            # More than one modification is not allowed
+            if count > 1:
+                return False
+            
+            # If there is a violation, we have to adjust one of the two elements
+            if i > 0 and nums[i - 1] > nums[i + 1] and (i + 2 < n and nums[i] > nums[i + 2]):
+                return False
+            
+    return True
+
+# Input handling
+def main():
+    # Example input
+    nums = [4, 2, 3]
+    
+    print("Input Array:", nums)
+    
+    # Brute Force Result
+    brute_force_result = checkPossibilityBruteForce(nums.copy())
+    print("Can Become Non-decreasing (Brute Force):", brute_force_result)
+
+    # Optimized Result
+    optimized_result = checkPossibilityOptimized(nums)
+    print("Can Become Non-decreasing (Optimized):", optimized_result)
+
+if __name__ == "__main__":
+    main()
+Explanation of the Code
+Imports:
+
+No additional imports are necessary for this solution.
+Brute Force Function:
+
+checkPossibilityBruteForce(nums):
+Iterates through each element in nums.
+For each element, it attempts to replace it with every possible integer value in the range 
+[
+−
+1
+0
+5
+,
+1
+0
+5
+]
+[−10 
+5
+ ,10 
+5
+ ].
+After each replacement, it checks if the array is non-decreasing.
+If a valid configuration is found, it returns True; otherwise, it continues.
+If no valid configuration is found after checking all possibilities, it returns False.
+Optimized Function:
+
+checkPossibilityOptimized(nums):
+Initializes a counter to track the number of violations.
+Iterates through the array, checking for violations of the non-decreasing condition.
+If a violation is found:
+Increments the violation count.
+Checks if the violation can be fixed by adjusting either of the two involved elements.
+If more than one violation is found, returns False.
+Returns True if the array can be modified to be non-decreasing.
+main() Function:
+
+Provides an example input and calls both functions, printing their results.
+Conclusion
+This implementation efficiently checks if the array can become non-decreasing using both brute force and optimized approaches. The brute force solution serves educational purposes while the optimized solution is practical for larger input sizes.
+
+
+
+
+
+
