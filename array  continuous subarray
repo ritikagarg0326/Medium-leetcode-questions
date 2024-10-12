@@ -1,0 +1,166 @@
+Shortest Unsorted Continuous Subarray
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (37.08%)	7780	266
+Tags
+array
+
+Companies
+Given an integer array nums, you need to find one continuous subarray such that if you only sort this subarray in non-decreasing order, then the whole array will be sorted in non-decreasing order.
+
+Return the shortest such subarray and output its length.
+
+ 
+
+Example 1:
+
+Input: nums = [2,6,4,8,10,9,15]
+Output: 5
+Explanation: You need to sort [6, 4, 8, 10, 9] in ascending order to make the whole array sorted in ascending order.
+To solve the problem of finding the shortest unsorted continuous subarray that needs to be sorted to make the entire array sorted, we will present both a brute force solution and an optimized solution. Below are detailed explanations of each approach, along with their time and space complexities, followed by a full code implementation.
+
+Problem Overview
+Given an integer array nums, the goal is to find the length of the shortest continuous subarray that, if sorted, would make the entire array sorted.
+
+Brute Force Solution
+Understanding the Brute Force Approach:
+
+We can iterate over all possible subarrays in the array.
+For each subarray, we will sort it and check if sorting this subarray results in the entire array being sorted.
+We will keep track of the minimum length of such subarrays.
+Time Complexity:
+
+𝑂
+(
+𝑛
+3
+)
+O(n 
+3
+ ): There are 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ) possible subarrays, and sorting each subarray takes 
+𝑂
+(
+𝑛
+)
+O(n).
+Space Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): We need space for storing the sorted version of the subarray.
+Optimized Solution
+Understanding the Optimized Approach:
+
+We can determine the boundaries of the subarray that needs to be sorted by finding the first and last elements that are out of order.
+We will:
+Traverse from the beginning to find the first element that is greater than the next element.
+Traverse from the end to find the last element that is less than the previous element.
+Find the minimum and maximum of the unsorted subarray to determine if we need to expand our boundaries based on elements before and after this subarray.
+Time Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): We traverse the array a constant number of times.
+Space Complexity:
+
+𝑂
+(
+1
+)
+O(1): We use only a fixed amount of extra space.
+Full Code Implementation
+Here’s the complete Python implementation for both brute force and optimized approaches:
+
+python
+Copy code
+def findUnsortedSubarray_brute_force(nums):
+    """Brute force approach to find the length of the shortest unsorted continuous subarray."""
+    n = len(nums)
+    min_length = float('inf')
+    
+    for start in range(n):
+        for end in range(start + 1, n):
+            # Create a copy of the subarray and sort it
+            subarray = sorted(nums[start:end + 1])
+            # Create a new array with the subarray sorted
+            sorted_array = nums[:start] + subarray + nums[end + 1:]
+            # Check if the entire array is sorted
+            if sorted_array == sorted(nums):
+                min_length = min(min_length, end - start + 1)
+
+    return 0 if min_length == float('inf') else min_length
+
+def findUnsortedSubarray_optimized(nums):
+    """Optimized approach to find the length of the shortest unsorted continuous subarray."""
+    n = len(nums)
+    left, right = 0, n - 1
+    
+    # Find the first element that is out of order from the left
+    while left < n - 1 and nums[left] <= nums[left + 1]:
+        left += 1
+        
+    if left == n - 1:  # Array is already sorted
+        return 0
+
+    # Find the first element that is out of order from the right
+    while right > 0 and nums[right] >= nums[right - 1]:
+        right -= 1
+
+    # Find the minimum and maximum in the subarray nums[left:right + 1]
+    subarray_min = min(nums[left:right + 1])
+    subarray_max = max(nums[left:right + 1])
+
+    # Extend the left boundary if needed
+    while left > 0 and nums[left - 1] > subarray_min:
+        left -= 1
+
+    # Extend the right boundary if needed
+    while right < n - 1 and nums[right + 1] < subarray_max:
+        right += 1
+
+    return right - left + 1
+
+# Input handling
+def main():
+    nums = [2, 6, 4, 8, 10, 9, 15]  # Example input
+    print("Input Array:", nums)
+
+    # Brute Force Result
+    brute_force_result = findUnsortedSubarray_brute_force(nums)
+    print("Length of the shortest unsorted continuous subarray (Brute Force):", brute_force_result)
+
+    # Optimized Result
+    optimized_result = findUnsortedSubarray_optimized(nums)
+    print("Length of the shortest unsorted continuous subarray (Optimized):", optimized_result)
+
+if __name__ == "__main__":
+    main()
+Explanation of the Code
+findUnsortedSubarray_brute_force(nums):
+
+Initializes the minimum length as infinity.
+Iterates through all possible starting and ending indices of subarrays.
+For each subarray, sorts it and checks if sorting it results in the entire array being sorted.
+Updates the minimum length if a valid subarray is found.
+findUnsortedSubarray_optimized(nums):
+
+Initializes pointers left and right to find the boundaries of the unsorted subarray.
+Traverses from the start to find the first out-of-order element.
+Traverses from the end to find the last out-of-order element.
+Finds the minimum and maximum values in the identified subarray to check if we need to expand the boundaries.
+Returns the length of the subarray that needs to be sorted.
+main():
+
+Handles input and prints the results from both approaches.
+This implementation demonstrates both the brute force and optimized solutions to finding the shortest unsorted continuous subarray, showcasing their differences in efficiency and complexity.
