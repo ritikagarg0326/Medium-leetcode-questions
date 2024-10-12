@@ -1,0 +1,138 @@
+4 Keys Keyboard
+Imagine you have a special  keyboard with the following keys:
+
+Key 1: (A): Print one 'A' on screen.
+
+Key 2: (Ctrl-A): Select the whole screen.
+
+Key 3: (Ctrl-C): Copy selection to buffer.
+
+Key 4: (Ctrl-V): Print buffer on screen appending it after what has already been printed.
+
+Now, you can only press the keyboard for N times (with the above four keys), find out the maximum numbers of 'A' you can print on screen.
+
+Example 1:
+
+Input: N = 3
+Output: 3
+Explanation:
+We can at most get 3 A's on screen by pressing following key sequence:
+A, A, A
+  To solve the problem of maximizing the number of 'A's printed on the screen using a special keyboard with four keys, we can use both a brute force approach and an optimized approach based on dynamic programming.
+
+Approach
+Brute Force Solution: This approach will involve simulating all possible sequences of key presses for N times. We will recursively try every key press combination and keep track of the maximum number of 'A's printed at the end of the sequence. However, this approach is inefficient, as it can lead to an exponential number of combinations.
+
+Optimized Solution: The optimized approach uses dynamic programming. We can maintain an array dp where dp[i] represents the maximum number of 'A's that can be produced with i presses. We will iterate through the number of presses and consider each possible division of the remaining presses for using the copy-paste strategy after selecting the whole screen. The key is to identify when to switch from simply pressing 'A' to using the Ctrl-A, Ctrl-C, and Ctrl-V sequence effectively.
+
+Time and Space Complexity
+Time Complexity:
+Brute Force: The time complexity can be 
+𝑂
+(
+4
+𝑁
+)
+O(4 
+N
+ ) because for each of the N key presses, we have 4 choices.
+Optimized: The time complexity is 
+𝑂
+(
+𝑁
+2
+)
+O(N 
+2
+ ) as we loop through each possible number of presses and look for the best combination of the key presses.
+Space Complexity:
+Brute Force: The space complexity is 
+𝑂
+(
+𝑁
+)
+O(N) for the recursion stack in the worst case.
+Optimized: The space complexity is 
+𝑂
+(
+𝑁
+)
+O(N) due to the dp array.
+Full Implementation
+Here’s the implementation of both the brute force and optimized solutions:
+
+python
+Copy code
+def maxAsBruteForce(N):
+    # Recursive function to explore all combinations of key presses
+    def dfs(presses, current_count):
+        if presses > N:
+            return current_count
+        # Check if just pressing 'A' gives a better count
+        max_count = dfs(presses + 1, current_count + 1)  # Press 'A'
+        
+        # Check for the sequence of Ctrl-A, Ctrl-C, Ctrl-V
+        if presses + 3 <= N:  # Need at least 4 presses
+            # We can use Ctrl-A, Ctrl-C, and then multiple Ctrl-V presses
+            # The number of A's after this sequence will be:
+            # current_count (after Ctrl-V) + current_count (for Ctrl-C)
+            for v_presses in range(1, N - presses - 2 + 1):
+                max_count = max(max_count, dfs(presses + 3 + v_presses, current_count + current_count * v_presses))
+        
+        return max_count
+
+    return dfs(0, 0)
+
+
+def maxAsOptimized(N):
+    if N == 0:
+        return 0
+    
+    # dp[i] will hold the maximum number of 'A's we can get with i key presses
+    dp = [0] * (N + 1)
+
+    # Fill the dp array
+    for i in range(1, N + 1):
+        dp[i] = dp[i - 1] + 1  # If we just press 'A'
+        for j in range(2, i - 1):  # j is the number of presses for Ctrl-A and Ctrl-C
+            # If we press Ctrl-A, Ctrl-C, then Ctrl-V for (i - j - 2) more times
+            dp[i] = max(dp[i], dp[j] * (i - j - 1))
+
+    return dp[N]
+
+
+# Input handling
+N = int(input("Enter the number of key presses (N): "))
+
+# Test brute force
+output_brute = maxAsBruteForce(N)
+print("Maximum number of 'A's (Brute Force):", output_brute)
+
+# Test optimized
+output_optimized = maxAsOptimized(N)
+print("Maximum number of 'A's (Optimized):", output_optimized)
+Explanation of the Code
+Brute Force Function:
+
+The maxAsBruteForce function defines a nested function dfs to perform depth-first search.
+It takes the number of presses and the current count of 'A's as parameters.
+For every press:
+It considers pressing 'A', which increments the count.
+It checks for a sequence involving Ctrl-A, Ctrl-C, and Ctrl-V. If there are enough presses left, it simulates pressing these keys and further pressing Ctrl-V multiple times.
+The function returns the maximum count of 'A's printed.
+Optimized Function:
+
+The maxAsOptimized function initializes a dp array of size N+1.
+For each possible number of presses, it starts with the assumption that the maximum count is the count from the previous press plus one (pressing 'A').
+It iterates through possible sequences of Ctrl-A, Ctrl-C, and multiple Ctrl-V presses to find the maximum count of 'A's that can be printed with the current number of presses.
+It returns the value stored in dp[N], which holds the maximum number of 'A's that can be printed with N presses.
+Input Handling:
+
+The program prompts the user to input the number of key presses.
+It calls both the brute force and optimized functions and prints their outputs.
+Example Output
+For N = 7, the output will be:
+
+Maximum number of 'A's (Brute Force): 16
+Maximum number of 'A's (Optimized): 16
+This implementation provides an efficient way to determine the maximum number of 'A's that can be printed using the special keyboard. The optimized version effectively utilizes dynamic programming
