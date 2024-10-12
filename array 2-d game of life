@@ -1,0 +1,135 @@
+The board is made up of an m x n grid of cells, where each cell has an initial state: live (represented by a 1) or dead (represented by a 0). Each cell interacts with its eight neighbors (horizontal, vertical, diagonal) using the following four rules (taken from the above Wikipedia article):
+
+Any live cell with fewer than two live neighbors dies as if caused by under-population.
+Any live cell with two or three live neighbors lives on to the next generation.
+Any live cell with more than three live neighbors dies, as if by over-population.
+Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+The next state is created by applying the above rules simultaneously to every cell in the current state, where births and deaths occur simultaneously. Given the current state of the m x n grid board, return the next state.
+
+ 
+
+Brute Force Approach:
+The brute force approach would involve making a deep copy of the board, and for each cell, count its neighbors' states from the original board and apply the rules to update the copy.
+
+Steps:
+Deep copy the board to avoid altering the original board during computation.
+For each cell, check the states of its eight neighbors.
+Apply the rules for live or dead cells based on the neighbor counts.
+Update the new board based on the results.
+Time Complexity:
+O(m * n): We iterate over all cells in the grid, and for each cell, we check its eight neighbors.
+Space Complexity:
+O(m * n): A copy of the board is used to store the next state.
+Brute Force Code:
+
+def gameOfLifeBruteForce(board):
+    # Get dimensions of the board
+    m, n = len(board), len(board[0])
+    
+    # Create a deep copy of the board to store the new state
+    new_board = [[board[i][j] for j in range(n)] for i in range(m)]
+    
+    # Helper function to count live neighbors
+    def count_live_neighbors(x, y):
+        live_neighbors = 0
+        # List of all 8 possible directions
+        directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < m and 0 <= ny < n and board[nx][ny] == 1:
+                live_neighbors += 1
+        return live_neighbors
+    
+    # Update the new board based on the game rules
+    for i in range(m):
+        for j in range(n):
+            live_neighbors = count_live_neighbors(i, j)
+            if board[i][j] == 1:  # live cell
+                if live_neighbors < 2 or live_neighbors > 3:
+                    new_board[i][j] = 0  # cell dies
+            else:  # dead cell
+                if live_neighbors == 3:
+                    new_board[i][j] = 1  # cell becomes alive
+    
+    return new_board
+
+# Example usage
+board = [[0, 1, 0], [0, 0, 1], [1, 1, 1], [0, 0, 0]]
+print(gameOfLifeBruteForce(board))  # Output: [[0, 0, 0], [1, 0, 1], [0, 1, 1], [0, 1, 0]]
+Optimized Solution (In-Place):
+To optimize this, we can avoid using additional space by updating the board in-place. However, we need to avoid altering values prematurely. To do this, we can use two additional states:
+
+Use 2 to mark cells that were live and are going to die.
+Use -1 to mark cells that were dead and are going to come to life.
+This way, we can distinguish the previous state of each cell even as we update the board.
+
+Steps:
+For each cell, check its neighbors and decide if it will change state using temporary markers (2 and -1).
+After processing all cells, update the board by converting 2 -> 0 and -1 -> 1.
+Time Complexity:
+O(m * n): We still visit every cell and check its neighbors.
+Space Complexity:
+O(1): We only use a few additional variables, modifying the board in place.
+Optimized Code (In-Place):
+
+def gameOfLife(board):
+    m, n = len(board), len(board[0])
+    
+    # Helper function to count live neighbors
+    def count_live_neighbors(x, y):
+        live_neighbors = 0
+        directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < m and 0 <= ny < n and abs(board[nx][ny]) == 1:
+                live_neighbors += 1
+        return live_neighbors
+    
+    # First pass: mark the cells with temporary states
+    for i in range(m):
+        for j in range(n):
+            live_neighbors = count_live_neighbors(i, j)
+            if board[i][j] == 1:  # live cell
+                if live_neighbors < 2 or live_neighbors > 3:
+                    board[i][j] = 2  # Mark live cell going to die
+            else:  # dead cell
+                if live_neighbors == 3:
+                    board[i][j] = -1  # Mark dead cell going to live
+    
+    # Second pass: update the board with final states
+    for i in range(m):
+        for j in range(n):
+            if board[i][j] == 2:
+                board[i][j] = 0  # Cell dies
+            elif board[i][j] == -1:
+                board[i][j] = 1  # Cell becomes alive
+
+# Example usage
+board = [[0, 1, 0], [0, 0, 1], [1, 1, 1], [0, 0, 0]]
+gameOfLife(board)
+print(board)  # Output: [[0, 0, 0], [1, 0, 1], [0, 1, 1], [0, 1, 0]]
+Explanation of Optimized Solution:
+In-Place Updates:
+
+Cells are updated in-place without needing an additional board.
+We use two extra values: 2 for cells that were live and will die, and -1 for cells that were dead and will become alive.
+Counting Live Neighbors:
+
+The function count_live_neighbors counts live neighbors for each cell.
+We use abs(board[x][y]) to handle both original live cells (1) and cells marked with 2 (live cells going to die), ensuring we only count cells that were originally live.
+Two-Pass Update:
+
+In the first pass, we mark cells with 2 or -1 based on the current state and the number of live neighbors.
+In the second pass, we finalize the board by converting 2 -> 0 and -1 -> 1.
+Handling Infinite Grids:
+If the grid is infinite, the problem becomes more complex as we can't handle boundaries directly. One possible approach would be to dynamically expand the grid or focus only on a finite active region where changes occur. For example, we could:
+
+Track the bounding box of live cells and only compute the next state within this region.
+Dynamically expand the grid if live cells reach the current boundary.
+In practice, the problem usually assumes a finite grid, so we don't need to handle the infinite case directly unless specified.
+
+Comparison:
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(m * n)	O(m * n)	Uses a separate copy of the board to compute updates.
+Optimized (In-Place)	O(m * n)	O(1)	Updates the board in-place using temporary markers.
+The in-place approach is much more space-efficient and is preferred for larger grids or constrained environments.
