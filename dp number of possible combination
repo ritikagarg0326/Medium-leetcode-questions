@@ -1,0 +1,121 @@
+Combination Sum IV
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (54.31%)	7443	666
+Tags
+dynamic-programming
+
+Companies
+Given an array of distinct integers nums and a target integer target, return the number of possible combinations that add up to target.
+
+The test cases are generated so that the answer can fit in a 32-bit integer.
+
+ 
+
+Example 1:
+
+Input: nums = [1,2,3], target = 4
+Output: 7
+  To solve the problem of counting the number of combinations that sum up to a target using the integers in the given list, we can implement both a brute force solution and a dynamic programming optimization. Here’s how each approach works, along with the code.
+
+Problem Understanding
+Given an array of distinct integers nums and an integer target, we need to find the number of possible combinations that sum up to target. Importantly, the same number can be used multiple times in the combinations.
+
+Brute Force Solution
+In the brute force approach, we recursively explore every possible combination of numbers from nums that can sum up to the target. For each number, we can choose to include it in our combination or not, and we continue this until we reach the target or exceed it.
+
+Steps:
+Define a recursive function that takes the current target.
+If the target is zero, it means we found a valid combination, so we return 1.
+If the target becomes negative, we return 0 because it’s not a valid combination.
+For each number in nums, recursively call the function with the reduced target (current target minus the number).
+Time Complexity:
+O(n^t), where 
+𝑛
+n is the length of nums and 
+𝑡
+t is the target. This is because each number can be used repeatedly.
+Space Complexity:
+O(t): Due to the recursion stack.
+Brute Force Code:
+python
+Copy code
+def combination_sum4_brute(nums, target):
+    """Brute Force solution to count combinations that sum to target."""
+    def backtrack(remaining):
+        # Base case: If remaining is zero, we found a combination
+        if remaining == 0:
+            return 1
+        # If remaining is negative, it's not a valid combination
+        if remaining < 0:
+            return 0
+        
+        count = 0
+        # Try each number in nums
+        for num in nums:
+            count += backtrack(remaining - num)
+        
+        return count
+    
+    return backtrack(target)
+
+# Example usage
+print(combination_sum4_brute([1, 2, 3], 4))  # Output: 7
+print(combination_sum4_brute([9], 3))         # Output: 0
+Optimized Solution Using Dynamic Programming
+To optimize the brute force solution, we can use dynamic programming. We will create a DP array where dp[i] will store the number of combinations that sum up to i.
+
+Steps:
+Initialize a DP array of size target + 1 with all values set to 0, except for dp[0], which should be set to 1 (one way to reach the target of 0).
+For each value from 1 to target, iterate through each number in nums:
+For each number, if it can contribute to the sum (i.e., i - num >= 0), update dp[i] by adding dp[i - num] (the number of ways to reach i - num).
+The result will be found in dp[target].
+Time Complexity:
+O(n * t), where 
+𝑛
+n is the length of nums and 
+𝑡
+t is the target. Each number is considered for each sub-target.
+Space Complexity:
+O(t): For the DP array.
+Optimized Code:
+python
+Copy code
+def combination_sum4(nums, target):
+    """Optimized solution using dynamic programming."""
+    # DP array to store the number of combinations for each target value
+    dp = [0] * (target + 1)
+    dp[0] = 1  # Base case: one way to get to target 0
+    
+    # Iterate through all possible target values
+    for i in range(1, target + 1):
+        for num in nums:
+            if i - num >= 0:  # If the number can be used
+                dp[i] += dp[i - num]  # Add the ways to reach the remaining target
+    
+    return dp[target]
+
+# Example usage
+print(combination_sum4([1, 2, 3], 4))  # Output: 7
+print(combination_sum4([9], 3))         # Output: 0
+Explanation of the Optimized Code:
+DP Initialization: We create a DP array of size target + 1 and initialize dp[0] to 1 because there’s one way to reach the target of 0 (by choosing no numbers).
+Filling the DP Table:
+For each target from 1 to the desired target, we check all numbers in nums.
+If the current number can contribute to the sum (i.e., it doesn’t exceed the current target), we update dp[i] by adding the count of combinations that sum to i - num.
+Final Result: The total number of combinations to reach the target is found at dp[target].
+Summary of Comparison:
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(n^t)	O(t)	Recursively explores all possible combinations.
+Dynamic Programming	O(n * t)	O(t)	Uses memoization to store results for sub-targets, avoiding redundancy.
+The optimized solution is significantly more efficient for larger values of target and is the preferred method in practice.
+
+Follow-Up on Negative Numbers
+If negative numbers are allowed, the problem changes significantly. In this case:
+
+Infinite Combinations: You can reach the target using negative numbers infinitely. For example, if nums = [1, -1] and target = 0, you can keep adding -1 to 1, resulting in an infinite number of combinations.
+Limitation: To allow negative numbers while preventing infinite combinations, we could set constraints such as only allowing a limited number of repetitions or defining a specific set of numbers (e.g., ensuring that negative numbers must be used in a controlled manner).
+
+
+
+
+
