@@ -1,0 +1,172 @@
+Heaters
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (38.61%)	2144	1169
+Tags
+binary-search
+
+Companies
+Winter is coming! During the contest, your first job is to design a standard heater with a fixed warm radius to warm all the houses.
+
+Every house can be warmed, as long as the house is within the heater's warm radius range. 
+
+Given the positions of houses and heaters on a horizontal line, return the minimum radius standard of heaters so that those heaters could cover all houses.
+
+Notice that all the heaters follow your radius standard, and the warm radius will the same.
+
+ 
+
+Example 1:
+
+Input: houses = [1,2,3], heaters = [2]
+Output: 1
+Explanation: The only heater was placed in the position 2, and if we use the radius 1 standard, then all the houses can be warmed.
+To solve the "Heaters" problem, we need to determine the minimum radius required for heaters such that all the houses are within the coverage area of at least one heater.
+
+Problem Breakdown
+Understanding Coverage: Each heater has a certain radius 
+𝑟
+r. A heater at position 
+ℎ
+h can cover a house at position 
+𝑝
+p if:
+
+∣
+ℎ
+−
+𝑝
+∣
+≤
+𝑟
+∣h−p∣≤r
+This means the house 
+𝑝
+p must lie within the interval 
+[
+ℎ
+−
+𝑟
+,
+ℎ
++
+𝑟
+]
+[h−r,h+r].
+
+Finding the Minimum Radius: The goal is to find the smallest radius 
+𝑟
+r such that all houses are covered by at least one heater.
+
+Approach
+Sorting: First, sort both the houses and heaters. This will help in efficiently finding the nearest heater for each house.
+
+Binary Search: For each house, use binary search to find the closest heater and calculate the distance from the house to that heater. The maximum of these minimum distances will be the required radius.
+
+Brute Force Solution
+The brute force approach checks every heater for each house, calculating the distance and keeping track of the minimum required radius.
+
+Steps
+For each house, iterate through all heaters to find the distance to each heater.
+Keep track of the minimum distance for that house.
+The answer will be the maximum of these minimum distances across all houses.
+Time Complexity
+O(h * k): Where 
+ℎ
+h is the number of houses and 
+𝑘
+k is the number of heaters.
+Space Complexity
+O(1): No extra space is used apart from variables for tracking.
+Brute Force Code Implementation
+python
+Copy code
+def findRadius(houses, heaters):
+    """Brute force solution to find the minimum radius required for heaters."""
+    max_radius = 0
+    
+    for house in houses:
+        min_distance = float('inf')  # Start with an infinitely large distance
+        for heater in heaters:
+            distance = abs(house - heater)
+            min_distance = min(min_distance, distance)  # Find the closest heater
+        max_radius = max(max_radius, min_distance)  # Update the max radius needed
+
+    return max_radius
+
+# Example usage
+houses = [1, 2, 3]
+heaters = [2]
+print(findRadius(houses, heaters))  # Output: 1
+Optimized Solution
+The optimized approach leverages sorting and binary search to efficiently find the closest heater for each house.
+
+Steps
+Sort the heaters.
+For each house, use binary search to find the position of the closest heater.
+Calculate the distance from the house to the nearest heater found using binary search.
+Keep track of the maximum distance across all houses.
+Time Complexity
+O(h log k): Where 
+ℎ
+h is the number of houses and 
+𝑘
+k is the number of heaters. The sorting step takes 
+𝑂
+(
+𝑘
+log
+⁡
+𝑘
+)
+O(klogk), and each binary search for 
+ℎ
+h houses takes 
+𝑂
+(
+log
+⁡
+𝑘
+)
+O(logk).
+Space Complexity
+O(1): The space used is constant, aside from input storage.
+Optimized Code Implementation
+python
+Copy code
+import bisect
+
+def findRadius(houses, heaters):
+    """Optimized solution using sorting and binary search to find the minimum radius required for heaters."""
+    heaters.sort()  # Sort the heaters
+    max_radius = 0
+    
+    for house in houses:
+        # Use binary search to find the index of the closest heater
+        idx = bisect.bisect_left(heaters, house)
+        
+        # Calculate the distance to the closest heater(s)
+        distance = float('inf')
+        if idx < len(heaters):  # Check the right heater
+            distance = min(distance, abs(heaters[idx] - house))
+        if idx > 0:  # Check the left heater
+            distance = min(distance, abs(heaters[idx - 1] - house))
+        
+        max_radius = max(max_radius, distance)  # Update the max radius needed
+
+    return max_radius
+
+# Example usage
+houses = [1, 2, 3, 4]
+heaters = [1, 4]
+print(findRadius(houses, heaters))  # Output: 1
+Explanation of the Optimized Code
+Sorting Heaters: We sort the heaters to prepare for binary search.
+Binary Search: For each house, we use bisect.bisect_left to find the index of the closest heater:
+If the index is within the bounds of the heaters list, we calculate the distance to that heater.
+We also check the heater to the left if it exists, ensuring we consider both closest heaters.
+Updating Maximum Radius: We keep updating the maximum radius needed based on the minimum distances calculated for each house.
+Summary of Comparison
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(h * k)	O(1)	Checks every heater for each house to find minimum distances.
+Optimized	O(h log k)	O(1)	Uses sorting and binary search to efficiently find closest heaters.
+The optimized solution is significantly more efficient, especially as the number of houses and heaters increases, making it preferable for larger inputs.
