@@ -1,0 +1,157 @@
+Target Sum
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (47.59%)	11042	367
+Tags
+dynamic-programming | depth-first-search
+
+Companies
+You are given an integer array nums and an integer target.
+
+You want to build an expression out of nums by adding one of the symbols '+' and '-' before each integer in nums and then concatenate all the integers.
+
+For example, if nums = [2, 1], you can add a '+' before 2 and a '-' before 1 and concatenate them to build the expression "+2-1".
+Return the number of different expressions that you can build, which evaluates to target.
+
+ 
+
+Example 1:
+
+Input: nums = [1,1,1,1,1], target = 3
+Output: 5
+  To solve the "Target Sum" problem, we need to determine how many different ways we can assign the '+' and '-' operators to an array of integers such that their sum equals a given target.
+
+Problem Breakdown
+Understanding the Problem:
+
+We have an array nums and we can add either '+' or '-' before each number.
+We need to find the total number of unique expressions that evaluate to the target value.
+Mathematical Insight:
+
+If we let S1 be the sum of numbers with a '+' sign and S2 be the sum of numbers with a '-' sign, we can express the problem as:
+𝑆
+1
+−
+𝑆
+2
+=
+target
+S1−S2=target
+Since S1 + S2 = \text{sum(nums)}, we can derive:
+𝑆
+1
+=
+target
++
+sum(nums)
+2
+S1= 
+2
+target+sum(nums)
+​
+ 
+This means we need to find subsets of nums that sum up to 
+𝑆
+1
+S1.
+Approaches
+Brute Force Approach:
+
+Use recursion to try all combinations of adding '+' and '-' for each number.
+Count how many combinations evaluate to the target.
+Optimized Approach:
+
+Use dynamic programming (DP) to count the subsets that sum to 
+𝑆
+1
+S1.
+This avoids the overhead of recursion and is more efficient.
+Time and Space Complexity
+Brute Force:
+Time Complexity: O(2^n) (because each number can be either '+' or '-').
+Space Complexity: O(n) for the recursion stack.
+Dynamic Programming:
+Time Complexity: O(n * S1) where 
+𝑆
+1
+S1 is the target sum derived above.
+Space Complexity: O(S1) for the DP array.
+Brute Force Code Implementation
+Let's implement the brute force approach first.
+
+python
+Copy code
+def findTargetSumWays(nums, target):
+    """Brute force solution to count the number of ways to achieve target sum."""
+    def backtrack(index, current_sum):
+        # Base case: if we've considered all numbers
+        if index == len(nums):
+            return 1 if current_sum == target else 0
+        
+        # Explore both options: adding and subtracting the current number
+        return (backtrack(index + 1, current_sum + nums[index]) +
+                backtrack(index + 1, current_sum - nums[index]))
+
+    return backtrack(0, 0)
+
+# Example usage
+nums = [1, 1, 1, 1, 1]
+target = 3
+print(findTargetSumWays(nums, target))  # Output: 5
+Optimized Code Implementation
+Now, let's implement the optimized approach using dynamic programming.
+
+python
+Copy code
+def findTargetSumWays(nums, target):
+    """Optimized solution to count the number of ways to achieve target sum using dynamic programming."""
+    total_sum = sum(nums)
+    
+    # If target is not achievable, return 0
+    if total_sum < target or (target + total_sum) % 2 != 0:
+        return 0
+    
+    # S1 is the required sum for one subset
+    S1 = (target + total_sum) // 2
+    n = len(nums)
+    
+    # Initialize DP array
+    dp = [0] * (S1 + 1)
+    dp[0] = 1  # There's one way to achieve sum 0 (select nothing)
+    
+    # Fill the DP table
+    for num in nums:
+        for j in range(S1, num - 1, -1):  # Update from the back to avoid overwriting
+            dp[j] += dp[j - num]
+    
+    return dp[S1]
+
+# Example usage
+nums = [1, 1, 1, 1, 1]
+target = 3
+print(findTargetSumWays(nums, target))  # Output: 5
+Explanation of the Optimized Code
+Total Sum Calculation:
+
+We calculate the total sum of the numbers to check feasibility against the target.
+Feasibility Check:
+
+If the target exceeds the total sum or if the sum cannot be divided into two equal parts, we return 0.
+Subset Sum Calculation:
+
+We determine the subset sum 
+𝑆
+1
+S1 using the derived formula.
+We create a DP array where dp[j] counts the ways to get the sum j.
+Filling the DP Table:
+
+For each number in nums, we iterate backward in the DP array to avoid using the same number multiple times in the same iteration.
+We update dp[j] to include the current number's contributions to achieving the sum j.
+Final Result:
+
+The final answer is found in dp[S1], which tells us how many ways we can achieve that target sum.
+Summary of Comparison
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(2^n)	O(n)	Explores all combinations of symbols recursively.
+Optimized	O(n * S1)	O(S1)	Uses dynamic programming to count subsets summing to S1 efficiently.
+The optimized solution is the preferred method, especially for larger input sizes, as it significantly reduces computation time.
