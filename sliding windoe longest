@@ -1,0 +1,112 @@
+Longest Substring with At Most K Distinct Characters
+Given a string, find the length of the longest substring T that contains at most k distinct characters.
+
+Example 1:
+
+Input: s = "eceba", k = 2
+Output: 3
+Explanation: T is "ece" which its length is 3.
+To solve the problem of finding the length of the longest substring containing at most k distinct characters, we can approach it using two methods: a brute-force method and an optimized method. Below, I'll explain both approaches, provide the time and space complexity analysis, and then present the complete code for each method.
+
+Explanation of the Approach
+Brute Force Method:
+
+The brute-force approach involves checking all possible substrings of the given string.
+For each substring, we will count the number of distinct characters.
+If the count of distinct characters is less than or equal to k, we will check if the length of that substring is the longest found so far.
+This method is straightforward but can be inefficient due to its high time complexity.
+Optimized Method:
+
+The optimized approach uses the sliding window technique with a hashmap to count the occurrences of characters.
+We maintain two pointers (left and right) to represent the current substring.
+As we expand the right pointer to include more characters, we check the number of distinct characters using a dictionary.
+If the number of distinct characters exceeds k, we increment the left pointer to shrink the window until we are back to at most k distinct characters.
+We keep track of the maximum length of valid substrings throughout this process.
+Time and Space Complexity
+Brute Force Method:
+
+Time Complexity: O(n^3), where n is the length of the string. This is because we check all substrings (O(n^2)) and count distinct characters (O(n)).
+Space Complexity: O(1) if we don't consider the output as space.
+Optimized Method:
+
+Time Complexity: O(n), as we visit each character at most twice (once by the left pointer and once by the right pointer).
+Space Complexity: O(k) for the hashmap to store at most k distinct characters.
+Implementation
+Below is the complete code implementing both the brute-force and optimized solutions for the problem.
+
+python
+Copy code
+def length_of_longest_substring_brute_force(s, k):
+    n = len(s)
+    max_length = 0  # Variable to store the maximum length found
+
+    # Check all substrings
+    for i in range(n):
+        for j in range(i, n):
+            substring = s[i:j + 1]
+            # Use a set to find the distinct characters in the substring
+            distinct_chars = set(substring)
+            if len(distinct_chars) <= k:
+                max_length = max(max_length, j - i + 1)  # Update max length
+
+    return max_length
+
+def length_of_longest_substring_optimized(s, k):
+    char_count = {}
+    left = 0  # Left pointer for the sliding window
+    max_length = 0  # Variable to store the maximum length found
+
+    for right in range(len(s)):
+        # Add the current character to the count
+        char_count[s[right]] = char_count.get(s[right], 0) + 1
+
+        # If we have more than k distinct characters, shrink the window
+        while len(char_count) > k:
+            char_count[s[left]] -= 1
+            if char_count[s[left]] == 0:
+                del char_count[s[left]]  # Remove character from the map
+            left += 1  # Move the left pointer to the right
+
+        # Update the max length found
+        max_length = max(max_length, right - left + 1)
+
+    return max_length
+
+# Input handling
+s = "eceba"
+k = 2
+
+# Brute Force Method
+brute_force_result = length_of_longest_substring_brute_force(s, k)
+print("Length of longest substring (Brute Force):", brute_force_result)
+
+# Optimized Method
+optimized_result = length_of_longest_substring_optimized(s, k)
+print("Length of longest substring (Optimized):", optimized_result)
+Code Explanation:
+Function length_of_longest_substring_brute_force(s, k):
+
+Input: Takes the string s and the integer k.
+Nested Loop: Iterates through all possible substrings of s.
+Set for Distinct Characters: Uses a set to find unique characters in each substring.
+Update Maximum Length: Compares the length of valid substrings and updates max_length.
+Function length_of_longest_substring_optimized(s, k):
+
+Dictionary for Character Count: Initializes a dictionary to count occurrences of characters.
+Sliding Window: Maintains two pointers (left and right) for the current substring window.
+Expand and Contract: Expands the window by moving right and contracts it by moving left if the number of distinct characters exceeds k.
+Update Maximum Length: Updates max_length based on the current valid window.
+Input Handling:
+
+Defines s and k as per the example.
+Output:
+
+Prints the length of the longest substring found by both methods.
+Example Execution:
+For the input s = "eceba" and k = 2, both methods will output:
+
+plaintext
+Copy code
+Length of longest substring (Brute Force): 3
+Length of longest substring (Optimized): 3
+This indicates that the longest substring with at most 2 distinct characters has a length of 3, which is consistent with the given explanation.
