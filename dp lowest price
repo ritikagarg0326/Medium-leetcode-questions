@@ -1,0 +1,194 @@
+Shopping Offers
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (51.81%)	1522	763
+Tags
+dynamic-programming | depth-first-search
+
+Companies
+In LeetCode Store, there are n items to sell. Each item has a price. However, there are some special offers, and a special offer consists of one or more different kinds of items with a sale price.
+
+You are given an integer array price where price[i] is the price of the ith item, and an integer array needs where needs[i] is the number of pieces of the ith item you want to buy.
+
+You are also given an array special where special[i] is of size n + 1 where special[i][j] is the number of pieces of the jth item in the ith offer and special[i][n] (i.e., the last integer in the array) is the price of the ith offer.
+
+Return the lowest price you have to pay for exactly certain items as given, where you could make optimal use of the special offers. You are not allowed to buy more items than you want, even if that would lower the overall price. You could use any of the special offers as many times as you want.
+
+ To tackle the problem of determining the lowest price for a shopping list using available special offers, we can use both brute force and optimized dynamic programming approaches. Below, I will provide a detailed explanation of each method, including their time and space complexities, followed by a complete Python implementation.
+
+Problem Overview
+We need to find the minimum price to buy a certain quantity of items given their individual prices and available special offers. Each offer consists of specific quantities of items at a reduced price.
+
+Brute Force Solution
+Understanding the Brute Force Approach:
+
+The brute force method explores all possible combinations of using or not using each special offer.
+We recursively attempt to fulfill the needs by either using an offer or buying items individually.
+This leads to a tree-like structure where each node represents a state of our needs and the total cost incurred.
+Time Complexity:
+
+𝑂
+(
+2
+𝑚
+×
+𝑛
+)
+O(2 
+m
+ ×n): where 
+𝑚
+m is the number of special offers, and 
+𝑛
+n is the number of different items. This is because we have to explore combinations of offers and individual purchases.
+Space Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): where 
+𝑛
+n is the length of the needs array. This accounts for the recursion stack.
+Optimized Solution
+Understanding the Optimized Approach:
+
+We use dynamic programming with memoization to avoid recalculating the costs for the same state of needs.
+We define a recursive function that tries to fulfill the needs using available offers and caches the results.
+Time Complexity:
+
+𝑂
+(
+𝑚
+×
+𝑛
+𝑛
+)
+O(m×n 
+n
+ ): where 
+𝑚
+m is the number of special offers and 
+𝑛
+n is the number of items. The 
+𝑛
+𝑛
+n 
+n
+  factor comes from the number of possible combinations of item needs.
+Space Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): Similar to the brute force approach, we use space for memoization.
+Full Code Implementation
+Here’s the complete Python implementation for both the brute force and optimized approaches:
+
+python
+Copy code
+def shoppingOffers_brute_force(price, special, needs):
+    """Brute force solution to find the minimum cost."""
+    n = len(price)
+
+    def calculate_cost(needs):
+        # Base case: if no items are needed, cost is 0
+        if all(need == 0 for need in needs):
+            return 0
+        
+        # Start with buying items at normal price
+        min_cost = sum(needs[i] * price[i] for i in range(n))
+
+        # Explore all special offers
+        for offer in special:
+            new_needs = []
+            valid_offer = True
+
+            # Check if the offer can be applied
+            for i in range(n):
+                if needs[i] < offer[i]:
+                    valid_offer = False
+                    break
+                new_needs.append(needs[i] - offer[i])
+
+            if valid_offer:
+                cost_with_offer = offer[-1] + calculate_cost(new_needs)
+                min_cost = min(min_cost, cost_with_offer)
+
+        return min_cost
+
+    return calculate_cost(needs)
+
+def shoppingOffers_optimized(price, special, needs):
+    """Optimized solution using dynamic programming and memoization."""
+    n = len(price)
+    memo = {}
+
+    def calculate_cost(needs):
+        if tuple(needs) in memo:
+            return memo[tuple(needs)]
+
+        # Base case: if no items are needed, cost is 0
+        if all(need == 0 for need in needs):
+            return 0
+        
+        # Start with buying items at normal price
+        min_cost = sum(needs[i] * price[i] for i in range(n))
+
+        # Explore all special offers
+        for offer in special:
+            new_needs = []
+            valid_offer = True
+
+            # Check if the offer can be applied
+            for i in range(n):
+                if needs[i] < offer[i]:
+                    valid_offer = False
+                    break
+                new_needs.append(needs[i] - offer[i])
+
+            if valid_offer:
+                cost_with_offer = offer[-1] + calculate_cost(new_needs)
+                min_cost = min(min_cost, cost_with_offer)
+
+        # Memoize the result before returning
+        memo[tuple(needs)] = min_cost
+        return min_cost
+
+    return calculate_cost(needs)
+
+# Input handling
+def main():
+    # Example inputs
+    price = [2, 5]
+    special = [[3, 0, 5], [1, 2, 10]]
+    needs = [3, 2]
+
+    print("Input Prices:", price)
+    print("Special Offers:", special)
+    print("Needs:", needs)
+
+    # Brute Force Result
+    brute_force_result = shoppingOffers_brute_force(price, special, needs)
+    print("Minimum Cost (Brute Force):", brute_force_result)
+
+    # Optimized Result
+    optimized_result = shoppingOffers_optimized(price, special, needs)
+    print("Minimum Cost (Optimized):", optimized_result)
+
+if __name__ == "__main__":
+    main()
+Explanation of the Code
+shoppingOffers_brute_force(price, special, needs):
+
+Defines a recursive function calculate_cost to determine the minimum cost recursively.
+For each state of needs, it computes the cost of buying items directly and evaluates each special offer to see if it can be applied.
+If an offer can be used, it calculates the new needs and the associated cost, updating the minimum cost found.
+shoppingOffers_optimized(price, special, needs):
+
+Similar to the brute force solution, but uses a dictionary memo to cache results of previously computed states to avoid redundant calculations.
+This significantly speeds up the algorithm by reducing the number of recursive calls.
+main():
+
+Handles input and prints the results for both approaches.
+This implementation provides both a brute force and an optimized solution to the shopping offers problem, demonstrating the efficiency gains from using memoization in the dynamic programming approach.
