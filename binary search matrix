@@ -1,0 +1,172 @@
+Kth Smallest Element in a Sorted Matrix
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (62.80%)	9995	355
+Tags
+binary-search | heap
+
+Companies
+Given an n x n matrix where each of the rows and columns is sorted in ascending order, return the kth smallest element in the matrix.
+
+Note that it is the kth smallest element in the sorted order, not the kth distinct element.
+
+You must find a solution with a memory complexity better than O(n2).
+
+ 
+
+Example 1:
+
+Input: matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8
+Output: 13
+Explanation: The elements in the matrix are [1,5,9,10,11,12,13,13,15], and the 8th smallest number is 13
+  To solve the problem of finding the kth smallest element in a sorted matrix, we can implement both a brute force approach and an optimized approach. Let’s go through each solution step by step.
+
+Problem Understanding
+We are given an 
+𝑛
+×
+𝑛
+n×n matrix where each row and column is sorted in ascending order. Our task is to find the kth smallest element in this matrix.
+
+Brute Force Solution
+In the brute force solution, we can flatten the matrix into a single list, sort that list, and then retrieve the kth smallest element.
+
+Steps:
+Flatten the matrix into a single list.
+Sort the flattened list.
+Return the element at index 
+𝑘
+−
+1
+k−1 (because indices start at 0).
+Time Complexity:
+O(n^2 \log(n^2)): Flattening the matrix takes 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ), and sorting it takes 
+𝑂
+(
+𝑛
+2
+log
+⁡
+(
+𝑛
+2
+)
+)
+O(n 
+2
+ log(n 
+2
+ )).
+Space Complexity:
+O(n^2): We create a new list to hold all the elements.
+Brute Force Code:
+python
+Copy code
+def kth_smallest_brute(matrix, k):
+    """Brute force solution to find the kth smallest element."""
+    # Flatten the matrix into a single list
+    flat_list = [num for row in matrix for num in row]
+    # Sort the flattened list
+    flat_list.sort()
+    # Return the kth smallest element
+    return flat_list[k - 1]
+
+# Example usage
+print(kth_smallest_brute([[1,5,9],[10,11,13],[12,13,15]], 8))  # Output: 13
+print(kth_smallest_brute([[-5]], 1))                            # Output: -5
+Optimized Solution Using Binary Search
+The optimized approach utilizes binary search combined with counting elements to find the kth smallest element without flattening the matrix.
+
+Steps:
+Define the search space: The smallest element is the top-left corner (matrix[0][0]), and the largest is the bottom-right corner (matrix[n-1][n-1]).
+Binary Search:
+Calculate the middle value in the current search range.
+Count how many numbers in the matrix are less than or equal to this middle value.
+If the count is less than 
+𝑘
+k, move the left pointer up; otherwise, move the right pointer down.
+When the left pointer meets the right pointer, it will point to the kth smallest element.
+Time Complexity:
+O(n log(range)): Where 
+𝑟
+𝑎
+𝑛
+𝑔
+𝑒
+range is the difference between the maximum and minimum element in the matrix.
+Space Complexity:
+O(1): We are using only a few extra variables.
+Optimized Code:
+python
+Copy code
+def kth_smallest(matrix, k):
+    """Optimized solution to find the kth smallest element using binary search."""
+    n = len(matrix)
+    
+    # Define the search range
+    left, right = matrix[0][0], matrix[n - 1][n - 1]
+    
+    while left < right:
+        mid = left + (right - left) // 2  # Avoid potential overflow
+        count = 0  # Count of numbers less than or equal to mid
+        
+        # Count numbers in the matrix <= mid
+        for i in range(n):
+            count += bisect_right(matrix[i], mid)  # Count elements in each row
+            
+        if count < k:
+            left = mid + 1  # Look for a larger number
+        else:
+            right = mid  # Mid could be the answer
+            
+    return left  # The kth smallest number
+
+# Example usage
+print(kth_smallest([[1,5,9],[10,11,13],[12,13,15]], 8))  # Output: 13
+print(kth_smallest([[-5]], 1))                            # Output: -5
+Explanation of the Optimized Code:
+Binary Search Setup:
+
+We start with left as the smallest element and right as the largest element in the matrix.
+Counting Elements:
+
+For each middle value, we count how many numbers are less than or equal to mid. This is done efficiently using the bisect_right function, which gives the count of elements less than or equal to mid in a sorted row.
+Adjusting the Search Range:
+
+If the count is less than 
+𝑘
+k, we increase the lower bound (left), meaning we need to search for larger values.
+If the count is greater than or equal to 
+𝑘
+k, we adjust the upper bound (right), as we might have found the kth smallest value or still need to search for smaller values.
+Final Result:
+
+The loop continues until left equals right, at which point we have narrowed down to the kth smallest element.
+Summary of Comparison:
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(n^2 log(n^2))	O(n^2)	Flattens and sorts the matrix.
+Binary Search	O(n log(range))	O(1)	Uses binary search on the value range, counting elements in rows.
+The optimized solution is significantly more efficient, especially for larger matrices, and meets the memory complexity requirement of being better than 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ).
+
+Follow-Up on Constant Memory
+For constant memory 
+𝑂
+(
+1
+)
+O(1), you cannot use any additional data structures. However, the binary search approach uses only a fixed number of variables, making it space-efficient. If you need to ensure that no extra memory is used, one way to achieve that would be to perform in-place modifications, but that is not generally applicable for this problem without altering the original matrix.
