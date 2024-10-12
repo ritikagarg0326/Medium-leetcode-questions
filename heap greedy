@@ -1,0 +1,176 @@
+Split Array into Consecutive Subsequences
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (51.20%)	4451	805
+Tags
+heap | greedy
+
+Companies
+You are given an integer array nums that is sorted in non-decreasing order.
+
+Determine if it is possible to split nums into one or more subsequences such that both of the following conditions are true:
+
+Each subsequence is a consecutive increasing sequence (i.e. each integer is exactly one more than the previous integer).
+All subsequences have a length of 3 or more.
+Return true if you can split nums according to the above conditions, or false otherwise.
+
+A subsequence of an array is a new array that is formed from the original array by deleting some (can be none) of the elements without disturbing the relative positions of the remaining elements. (i.e., [1,3,5] is a subsequence of [1,2,3,4,5] while [1,3,2] is not).
+
+ 
+
+Example 1:
+
+Input: nums = [1,2,3,3,4,5]
+Output: true
+Explanation: nums can be split into the following subsequences:
+[1,2,3,3,4,5] --> 1, 2, 3
+[1,2,3,3,4,5] --> 3, 4, 5
+  To determine if we can split a sorted array nums into one or more consecutive increasing subsequences, we can explore both a brute force solution and an optimized approach. Below, I'll provide detailed explanations for both methods, including their time and space complexities, followed by the complete code.
+
+Problem Overview
+We need to split the sorted array nums into subsequences such that:
+
+Each subsequence is a consecutive increasing sequence.
+Each subsequence has a length of at least 3.
+Brute Force Solution
+Understanding the Brute Force Approach:
+
+We can generate all possible subsequences from nums and check if any of them meet the conditions.
+This is not practical for larger arrays due to the exponential number of subsequences.
+Time Complexity:
+
+𝑂
+(
+2
+𝑛
+)
+O(2 
+n
+ ): Generating all subsequences takes exponential time.
+Space Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): Storing subsequences can use linear space.
+Given the inefficiency of this approach, we will focus more on the optimized solution, which is feasible within the given constraints.
+
+Optimized Solution
+Understanding the Optimized Approach:
+
+We can use a greedy algorithm with the help of a frequency count of numbers in the array.
+We'll maintain two priority queues (or heaps) to track the ends of the subsequences being formed.
+For each number in nums, we will try to add it to an existing subsequence or start a new one if possible.
+Detailed Steps:
+
+Count the frequency of each number in nums.
+Use a greedy approach to build subsequences:
+If a number can extend an existing subsequence (i.e., it is one greater than the last number in the subsequence), append it to that subsequence.
+If it cannot extend any existing subsequences, try to start a new one.
+Ensure that each subsequence is valid (has a length of at least 3).
+Time Complexity:
+
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn): Each insertion into the priority queue takes logarithmic time.
+Space Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): We may use space for the frequency count and queues.
+Full Code Implementation
+Here’s the complete Python code for both the brute force and optimized approaches:
+
+python
+Copy code
+from collections import Counter
+import heapq
+
+def canSplitBruteForce(nums):
+    """Brute force solution (not practical for large inputs)."""
+    from itertools import combinations
+    
+    # Generate all possible subsequences and check conditions
+    n = len(nums)
+    for i in range(3, n + 1):
+        for combo in combinations(nums, i):
+            if all(combo[j] + 1 == combo[j + 1] for j in range(i - 1)):
+                return True
+    return False
+
+def canSplitOptimized(nums):
+    """Optimized solution using greedy approach and heaps."""
+    # Step 1: Count the frequency of each number
+    count = Counter(nums)
+    
+    # Step 2: Create a min-heap to store the ends of subsequences
+    ends = []  # This will store the end elements of active subsequences
+
+    for num in nums:
+        if count[num] == 0:  # If this number has already been used
+            continue
+        
+        count[num] -= 1  # Use one occurrence of the number
+        
+        # Check if we can extend an existing subsequence
+        if ends and ends[0] + 1 == num:
+            # Extend the smallest subsequence
+            smallest_end = heapq.heappop(ends)
+            heapq.heappush(ends, num)  # Push new end of this extended subsequence
+        elif count[num + 1] > 0 and count[num + 2] > 0:
+            # Start a new subsequence
+            count[num + 1] -= 1
+            count[num + 2] -= 1
+            heapq.heappush(ends, num + 2)  # Push the end of the new subsequence
+        else:
+            return False  # Cannot form a valid subsequence
+
+    return len(ends) > 0  # We must have at least one subsequence formed
+
+# Input handling
+def main():
+    # Example input
+    nums = [1, 2, 3, 3, 4, 5]
+    
+    print("Input Array:", nums)
+    
+    # Brute Force Result
+    brute_force_result = canSplitBruteForce(nums)
+    print("Can Split (Brute Force):", brute_force_result)
+
+    # Optimized Result
+    optimized_result = canSplitOptimized(nums)
+    print("Can Split (Optimized):", optimized_result)
+
+if __name__ == "__main__":
+    main()
+Explanation of the Code
+Imports:
+
+Counter is used for counting occurrences of each number.
+heapq is used to maintain the min-heap for the ends of subsequences.
+Brute Force Function:
+
+canSplitBruteForce(nums):
+Uses combinations to generate all possible subsequences of length 3 or more.
+Checks if each combination is a valid increasing sequence.
+Returns True if a valid subsequence is found; otherwise, False.
+Optimized Function:
+
+canSplitOptimized(nums):
+Counts the frequency of each number.
+Iterates through nums, attempting to either extend existing subsequences or start new ones.
+Uses the min-heap to efficiently manage the ends of subsequences.
+Returns True if subsequences can be formed, otherwise False.
+main() Function:
+
+Provides an example input and calls both functions, printing their results.
+Conclusion
+This implementation efficiently checks if the sorted array can be split into valid subsequences using both brute force and optimized approaches. The brute force solution is presented for educational purposes, while the optimized solution is practical and efficient for large input sizes.
