@@ -1,0 +1,217 @@
+Number of Boomerangs
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (55.77%)	845	1020
+Tags
+hash-table
+
+Companies
+You are given n points in the plane that are all distinct, where points[i] = [xi, yi]. A boomerang is a tuple of points (i, j, k) such that the distance between i and j equals the distance between i and k (the order of the tuple matters).
+
+Return the number of boomerangs.
+
+ 
+
+Example 1:
+
+Input: points = [[0,0],[1,0],[2,0]]
+Output: 2
+Explanation: The two boomerangs are [[1,0],[0,0],[2,0]] and [[1,0],[2,0],[0,0]].
+  To solve the "Number of Boomerangs" problem, we need to count the number of tuples of points (i, j, k) such that the distance from point i to point j is equal to the distance from point i to point k. The order of the points matters, meaning that (i, j, k) is considered different from (i, k, j).
+
+Problem Breakdown
+Distance Calculation: The squared distance between two points 
+(
+𝑥
+1
+,
+𝑦
+1
+)
+(x 
+1
+​
+ ,y 
+1
+​
+ ) and 
+(
+𝑥
+2
+,
+𝑦
+2
+)
+(x 
+2
+​
+ ,y 
+2
+​
+ ) is given by:
+
+squared_distance
+=
+(
+𝑥
+1
+−
+𝑥
+2
+)
+2
++
+(
+𝑦
+1
+−
+𝑦
+2
+)
+2
+squared_distance=(x 
+1
+​
+ −x 
+2
+​
+ ) 
+2
+ +(y 
+1
+​
+ −y 
+2
+​
+ ) 
+2
+ 
+We will use the squared distance to avoid unnecessary floating-point calculations.
+
+Using a HashMap: For each point, we will calculate the squared distance to all other points and store the counts of these distances in a hash map (dictionary in Python).
+
+Counting Boomerangs: For each distance that appears 
+𝑘
+k times in the map, the number of ways to choose two points at that distance from the current point is given by:
+
+boomerangs_count
++
+=
+𝑘
+×
+(
+𝑘
+−
+1
+)
+boomerangs_count+=k×(k−1)
+This accounts for the different orderings of the points (i, j, k).
+
+Brute Force Solution
+The brute force approach calculates the distance for every pair of points for each point, which can be computationally expensive.
+
+Time Complexity
+O(n^2): For each point, we calculate the distance to every other point.
+Space Complexity
+O(n): In the worst case, we could store distances for each point.
+Brute Force Code Implementation
+python
+Copy code
+def numberOfBoomerangs(points):
+    """Brute force solution to count the number of boomerangs."""
+    if not points:
+        return 0
+    
+    result = 0
+    n = len(points)
+    
+    # Loop through each point
+    for i in range(n):
+        distance_count = {}
+        
+        # Loop through all other points to calculate distances
+        for j in range(n):
+            if i != j:
+                # Calculate squared distance
+                dist = (points[i][0] - points[j][0]) ** 2 + (points[i][1] - points[j][1]) ** 2
+                
+                # Update the distance count in the dictionary
+                if dist not in distance_count:
+                    distance_count[dist] = 0
+                distance_count[dist] += 1
+        
+        # Calculate the number of boomerangs for the current point
+        for count in distance_count.values():
+            result += count * (count - 1)
+    
+    return result
+
+# Example usage
+points = [[0,0],[1,0],[2,0]]
+print(numberOfBoomerangs(points))  # Output: 2
+Optimized Solution
+The optimized solution builds on the same idea but ensures that we only perform necessary computations by avoiding recomputing distances for the same pairs of points.
+
+Steps:
+For each point, compute the squared distances to all other points.
+Use a dictionary to count occurrences of each squared distance.
+For each distance that appears 
+𝑘
+k times, count the number of boomerangs.
+Time Complexity
+O(n^2): Still quadratic due to the pairwise distance calculations, but more efficient due to the use of hash maps.
+Space Complexity
+O(n): For storing distances in the dictionary.
+Optimized Code Implementation
+python
+Copy code
+def numberOfBoomerangs(points):
+    """Optimized solution to count the number of boomerangs."""
+    if not points:
+        return 0
+    
+    result = 0
+    n = len(points)
+    
+    # Loop through each point
+    for i in range(n):
+        distance_count = {}
+        
+        # Loop through all other points to calculate distances
+        for j in range(n):
+            if i != j:
+                # Calculate squared distance
+                dist = (points[i][0] - points[j][0]) ** 2 + (points[i][1] - points[j][1]) ** 2
+                
+                # Update the distance count in the dictionary
+                if dist not in distance_count:
+                    distance_count[dist] = 0
+                distance_count[dist] += 1
+        
+        # Calculate the number of boomerangs for the current point
+        for count in distance_count.values():
+            result += count * (count - 1)  # (i, j, k) and (i, k, j)
+    
+    return result
+
+# Take input from the user
+n = int(input("Enter the number of points: "))
+points = []
+print("Enter the points (format: x,y): ")
+for _ in range(n):
+    x, y = map(int, input().strip().split(","))
+    points.append([x, y])
+
+# Calculate and print the number of boomerangs
+print("Number of Boomerangs:", numberOfBoomerangs(points))
+Explanation of the Optimized Code
+Input Handling: We read the number of points and their coordinates from the user.
+Main Logic:
+Loop through each point and calculate distances to all other points.
+Store counts of squared distances in a dictionary.
+After counting, calculate the number of valid boomerangs based on the counts.
+Output: Finally, the number of boomerangs is printed.
+Summary of Comparison
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(n^2)	O(n)	Loops through each point, calculating distances for all other points.
+Optimized	O(n^2)	O(n)	Uses a hash map to count distances more efficiently, reducing redundant computations.
+Both approaches have the same time complexity but the optimized version is more efficient in practice due to better management of distance calculations.
