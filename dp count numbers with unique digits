@@ -1,0 +1,186 @@
+Count Numbers with Unique Digits
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (53.40%)	1560	1500
+Tags
+math | dynamic-programming | backtracking
+
+Companies
+Given an integer n, return the count of all numbers with unique digits, x, where 0 <= x < 10n.
+
+Example 1:
+
+Input: n = 2
+Output: 91
+Explanation: The answer should be the total numbers in the range of 0 ≤ x < 100, excluding 11,22,33,44,55,66,77,88,99
+  To solve the problem of counting numbers with unique digits less than 
+1
+0
+𝑛
+10 
+n
+ , we can approach this using both a brute force method and an optimized mathematical approach.
+
+Brute Force Solution
+The brute force approach involves generating all numbers in the range from 
+0
+0 to 
+1
+0
+𝑛
+−
+1
+10 
+n
+ −1 and counting those with unique digits.
+
+Steps:
+Loop through all numbers from 
+0
+0 to 
+1
+0
+𝑛
+−
+1
+10 
+n
+ −1.
+For each number, check if the digits are unique.
+Count the numbers with unique digits.
+Time Complexity:
+O(n \cdot 10^n): The loop runs for 
+1
+0
+𝑛
+10 
+n
+  iterations and checking for unique digits takes 
+𝑂
+(
+𝑛
+)
+O(n) time for each number.
+Space Complexity:
+O(1): We are only using a fixed amount of extra space for counting.
+Brute Force Code:
+
+def has_unique_digits(x):
+    """Check if the digits of the number x are unique."""
+    digits = str(x)
+    return len(digits) == len(set(digits))
+
+def count_numbers_with_unique_digits_brute(n):
+    """Count numbers with unique digits using brute force."""
+    count = 0
+    for i in range(10**n):  # Iterate from 0 to 10^n - 1
+        if has_unique_digits(i):
+            count += 1
+    return count
+
+# Example usage
+print(count_numbers_with_unique_digits_brute(2))  # Output: 91
+print(count_numbers_with_unique_digits_brute(0))  # Output: 1
+Optimized Solution
+In the optimized solution, we can use a combinatorial approach to count the numbers with unique digits without generating them explicitly. The idea is to count valid digits for each position in the number.
+
+Steps:
+Base Cases:
+
+If 
+𝑛
+=
+0
+n=0, the only number is 
+0
+0, so return 
+1
+1.
+If 
+𝑛
+=
+1
+n=1, the unique digits are 
+0
+0 through 
+9
+9, so return 
+10
+10.
+Count Unique Digits:
+
+For numbers with more than 1 digit, calculate how many numbers can be formed:
+The first digit can be 
+1
+−
+9
+1−9 (9 choices) to avoid leading zeros.
+The subsequent digits can be chosen from the remaining digits available.
+Use Combinations:
+
+Use the formula:
+Total unique numbers for each digit position based on remaining choices.
+Time Complexity:
+O(n): The calculation involves a fixed number of operations related to the number of digits.
+Space Complexity:
+O(1): We only use a few variables for counting.
+Optimized Code:
+
+def count_numbers_with_unique_digits(n):
+    """Count numbers with unique digits using combinatorial counting."""
+    if n == 0:
+        return 1  # Only the number 0
+    if n == 1:
+        return 10  # Numbers from 0 to 9
+    
+    count = 10  # Start with 0 to 9
+    
+    unique_digits = 9  # First digit can be 1-9 (9 options)
+    available_numbers = 9  # Remaining digits can be 0-9 except the first digit
+    
+    for i in range(2, n + 1):  # Start from the second digit to nth digit
+        count += unique_digits * available_numbers
+        unique_digits -= 1  # One less option for the first digit
+        available_numbers -= 1  # One less option for the subsequent digits
+    
+    return count
+
+# Example usage
+print(count_numbers_with_unique_digits(2))  # Output: 91
+print(count_numbers_with_unique_digits(0))  # Output: 1
+Explanation of the Optimized Code:
+Base Cases: We handle special cases for 
+𝑛
+=
+0
+n=0 and 
+𝑛
+=
+1
+n=1 directly.
+Count Initialization: We start counting with all unique numbers from 
+0
+0 to 
+9
+9 (10 numbers).
+Loop for Higher Digits:
+For each number of digits from 
+2
+2 to 
+𝑛
+n:
+The first digit can be any of the 
+9
+9 digits (from 
+1
+1 to 
+9
+9).
+The remaining digits can be filled using the remaining available digits, which decreases as we fill more positions.
+Count Update: We incrementally update the count based on the number of choices for each digit position.
+Summary of Comparison:
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(n \cdot 10^n)	O(1)	Generates all numbers and checks for uniqueness.
+Optimized	O(n)	O(1)	Uses combinatorial counting based on digit positions.
+The optimized solution is preferred, especially for larger values of 
+𝑛
+n (up to 8), due to its efficiency in calculating the count directly.
