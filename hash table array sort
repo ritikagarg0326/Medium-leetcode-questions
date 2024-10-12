@@ -1,0 +1,107 @@
+Problem Explanation:
+Given an array citations where citations[i] is the number of citations a researcher received for their i-th paper, we need to return the researcher's h-index.
+
+The h-index is defined as the maximum value h such that the researcher has published at least h papers that have each been cited at least h times.
+
+Example:
+Input: citations = [3, 0, 6, 1, 5]
+
+Explanation: The researcher has 5 papers, and we need to calculate the maximum h-index. The result is 3, because there are at least 3 papers with 3 or more citations.
+Input: citations = [1, 3, 1]
+
+Explanation: The researcher has at least 1 paper with 1 or more citations. Hence, the h-index is 1.
+Brute Force Solution:
+In the brute force solution, we can iterate over all possible values of h and check how many papers have at least h citations. The largest h for which this condition holds is the h-index.
+
+Steps:
+Loop through all possible values of h from 1 to n (number of papers).
+For each h, count how many papers have at least h citations.
+If the count is greater than or equal to h, store the maximum possible value of h.
+Time Complexity:
+O(n^2): For each potential h-index (n possible values), we need to count how many papers have at least h citations, which requires looping through the entire list.
+Space Complexity:
+O(1): Only a few variables are used for counting and storing the result.
+Brute Force Code:
+
+def hIndexBruteForce(citations):
+    n = len(citations)
+    h_index = 0
+    
+    for h in range(1, n + 1):
+        count = 0
+        # Count how many papers have at least 'h' citations
+        for citation in citations:
+            if citation >= h:
+                count += 1
+        # If we have at least 'h' papers with 'h' citations, update the h-index
+        if count >= h:
+            h_index = h
+    
+    return h_index
+
+# Example usage
+citations = [3, 0, 6, 1, 5]
+print(hIndexBruteForce(citations))  # Output: 3
+Optimized Solution:
+We can optimize the solution by sorting the list of citations in descending order and finding the h-index in one pass.
+
+Steps:
+Sort the array of citations in descending order.
+Iterate through the sorted citations and find the maximum index i such that citations[i] >= i + 1. This value corresponds to the h-index.
+Return the largest i where the number of citations is greater than or equal to the number of papers indexed by i.
+Time Complexity:
+O(n log n): Sorting the array takes O(n log n) time.
+Space Complexity:
+O(1): Only a few variables are used in the optimized solution.
+Optimized Code:
+
+def hIndexOptimized(citations):
+    # Sort the citations in descending order
+    citations.sort(reverse=True)
+    h_index = 0
+    
+    # Find the largest index such that citations[i] >= i + 1
+    for i in range(len(citations)):
+        if citations[i] >= i + 1:
+            h_index = i + 1
+        else:
+            break
+    
+    return h_index
+
+# Example usage
+citations = [3, 0, 6, 1, 5]
+print(hIndexOptimized(citations))  # Output: 3
+Explanation of Optimized Solution:
+Sorting the Citations:
+
+First, we sort the citations array in descending order. This allows us to easily compare the number of papers that have at least a certain number of citations.
+Finding the h-index:
+
+We then iterate through the sorted array. For each paper i, if the number of citations is greater than or equal to i + 1, we update the h-index.
+The loop stops when we find the first paper that doesn't meet the condition, and we return the largest h-index found so far.
+Example Walkthrough:
+Let's take the example citations = [3, 0, 6, 1, 5]:
+
+Brute Force:
+
+We try all possible values of h from 1 to 5 (total number of papers):
+For h = 1: There are 5 papers with at least 1 citation.
+For h = 2: There are 4 papers with at least 2 citations.
+For h = 3: There are 3 papers with at least 3 citations. Hence, the h-index is 3.
+For h = 4: Only 2 papers have at least 4 citations, so the h-index does not increase.
+Result: 3
+Optimized Solution:
+
+We sort the citations: [6, 5, 3, 1, 0].
+We iterate through the sorted array:
+For i = 0 (paper 1 with 6 citations): Since 6 >= 1, h-index is 1.
+For i = 1 (paper 2 with 5 citations): Since 5 >= 2, h-index is 2.
+For i = 2 (paper 3 with 3 citations): Since 3 >= 3, h-index is 3.
+For i = 3 (paper 4 with 1 citation): Since 1 < 4, stop here.
+Result: 3
+Comparison:
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(n^2)	O(1)	Checks each possible h-index and counts.
+Optimized (Sort)	O(n log n)	O(1)	Sorts and then finds h-index in one pass.
+The optimized approach is more efficient, especially when the number of papers (n) is large.
