@@ -1,0 +1,197 @@
+Flip Game II
+Best video game consoles
+You are playing the following Flip Game with your friend: Given a string that contains only these two characters: + and -, you and your friend take turns to flip two consecutive "++" into "--". The game ends when a person can no longer make a move and therefore the other person will be the winner.
+
+Write a function to determine if the starting player can guarantee a win.
+
+Example:
+
+Input: s = "++++"
+Output: true
+Explanation: The starting player can guarantee a win by flipping the middle "++" to become "+--+".
+Follow up:
+Derive your algorithm's runtime complexity.
+  Problem Explanation:
+You are playing the Flip Game with a friend, and the rules are as follows:
+
+The string consists of two characters: + and -.
+You and your friend take turns flipping any two consecutive "++" into "--".
+The game ends when no more moves can be made. The player who cannot make a move loses, and the other player wins.
+You need to determine if the starting player (you) can guarantee a win given the initial string.
+
+Example:
+Input:
+
+python
+Copy code
+s = "++++"
+Output:
+
+python
+Copy code
+True
+Explanation: The starting player can flip the middle "++" to become "+--+", which guarantees the win for the starting player.
+
+Brute Force Solution:
+The brute force approach involves checking all possible flips that can be made, and recursively determining if the opponent can guarantee a win after each move.
+
+Approach:
+Base Case: If no more moves can be made (i.e., there are no "++" pairs left in the string), the current player loses.
+Recursive Case: For each occurrence of "++", the current player flips it to "--", and recursively checks if the opponent can win in this new game state. If the opponent cannot win in any possible next game state, then the current player wins.
+Brute Force Code:
+python
+Copy code
+def can_win_brute_force(s):
+    # Convert the string to a list for easier modification
+    s = list(s)
+    
+    # Helper function for recursion
+    def can_win(s):
+        for i in range(len(s) - 1):
+            if s[i] == '+' and s[i + 1] == '+':
+                # Try to flip "++" to "--"
+                s[i], s[i + 1] = '-', '-'
+                # If the opponent cannot win, return True
+                if not can_win(s):
+                    # Revert the flip
+                    s[i], s[i + 1] = '+', '+'
+                    return True
+                # Revert the flip
+                s[i], s[i + 1] = '+', '+'
+        # If no winning move is found, return False
+        return False
+    
+    return can_win(s)
+
+# Input handling
+s = input("Enter the string of + and -: ")
+
+# Call the brute force solution
+result = can_win_brute_force(s)
+
+# Output result
+print("Can the starting player guarantee a win? (Brute Force):", result)
+Explanation of the Brute Force Code:
+Convert string to list: The string is converted into a list of characters since strings in Python are immutable.
+Recursive helper: The helper function can_win goes through all possible flips of "++" to "--". For each flip, it checks if the opponent can win by calling can_win recursively. If there is any move that leads to the opponent not being able to win, the current player wins.
+Revert the move: After checking each move, the game state is reverted to its original form to explore other possibilities.
+Time Complexity:
+The time complexity is exponential because for each "++" pair, the function makes a recursive call. Thus, the time complexity is 
+𝑂
+(
+2
+𝑛
+)
+O(2 
+n
+ ), where n is the length of the string.
+Space Complexity:
+The space complexity is 
+𝑂
+(
+𝑛
+)
+O(n) due to the recursive call stack and the usage of the list for storing game states.
+Optimized Solution Using Memoization:
+The brute force solution explores many game states multiple times, which can be avoided by using memoization to store results of previously evaluated game states.
+
+Approach:
+Memoization: Store the result for each game state to avoid recomputation. This prevents revisiting the same game state multiple times.
+Recursive Case: Similar to the brute force approach, but we first check if the result for the current game state is already computed before making recursive calls.
+Optimized Code with Memoization:
+python
+Copy code
+def can_win_optimized(s):
+    # Convert the string to a list for easier modification
+    s = list(s)
+    
+    # Memoization dictionary
+    memo = {}
+    
+    # Helper function for recursion
+    def can_win(s):
+        # Convert the list back to string for memoization
+        key = ''.join(s)
+        
+        # If the result is already computed for this game state, return it
+        if key in memo:
+            return memo[key]
+        
+        for i in range(len(s) - 1):
+            if s[i] == '+' and s[i + 1] == '+':
+                # Try to flip "++" to "--"
+                s[i], s[i + 1] = '-', '-'
+                # If the opponent cannot win, return True
+                if not can_win(s):
+                    # Revert the flip and store the result
+                    s[i], s[i + 1] = '+', '+'
+                    memo[key] = True
+                    return True
+                # Revert the flip
+                s[i], s[i + 1] = '+', '+'
+        
+        # If no winning move is found, store and return False
+        memo[key] = False
+        return False
+    
+    return can_win(s)
+
+# Input handling
+s = input("Enter the string of + and -: ")
+
+# Call the optimized solution
+result = can_win_optimized(s)
+
+# Output result
+print("Can the starting player guarantee a win? (Optimized):", result)
+Explanation of the Optimized Code:
+Memoization: A dictionary memo stores the results of previously evaluated game states. The key is the string representation of the current state, and the value is a boolean indicating whether the current player can win from that state.
+Recursive helper: The helper function can_win checks the memo dictionary before making recursive calls. If the result is already known for a given state, it is returned directly, avoiding recomputation.
+State storage: The game state is converted back to a string for easy memoization.
+Time Complexity:
+The time complexity is reduced significantly due to memoization. The number of unique game states is bounded by the length of the string n. In the worst case, the time complexity is 
+𝑂
+(
+𝑛
+⋅
+2
+𝑛
+)
+O(n⋅2 
+n
+ ), where 
+𝑛
+n is the length of the string.
+Space Complexity:
+The space complexity is 
+𝑂
+(
+𝑛
+⋅
+2
+𝑛
+)
+O(n⋅2 
+n
+ ) due to the memoization dictionary, which can store up to 
+2
+𝑛
+2 
+n
+  game states.
+Example Execution:
+Input:
+bash
+Copy code
+Enter the string of + and -: ++++
+Output (Brute Force):
+bash
+Copy code
+Can the starting player guarantee a win? (Brute Force): True
+Output (Optimized):
+bash
+Copy code
+Can the starting player guarantee a win? (Optimized): True
+Conclusion:
+The brute force solution explores all possible game states recursively, resulting in exponential time complexity.
+The optimized solution uses memoization to store results of previously evaluated game states, reducing redundant computation and improving performance.
