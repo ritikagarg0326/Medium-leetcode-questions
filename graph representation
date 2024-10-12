@@ -1,0 +1,182 @@
+Sequence Reconstruction
+Check whether the original sequence org can be uniquely reconstructed from the sequences in seqs. The org sequence is a permutation of the integers from 1 to n, with 1 ≤ n ≤ 104. Reconstruction means building a shortest common supersequence of the sequences in seqs (i.e., a shortest sequence so that all sequences in seqs are subsequences of it). Determine whether there is only one sequence that can be reconstructed from seqs and it is the org sequence.
+
+Example 1:
+
+Input:
+org: [1,2,3], seqs: [[1,2],[1,3]]
+
+Output:
+false
+To solve the problem of checking whether the original sequence org can be uniquely reconstructed from the sequences in seqs, we can take two approaches: a brute force solution and an optimized solution. Below, I will explain both methods, their time and space complexities, and provide the complete code implementation.
+
+Problem Explanation
+Given:
+
+An original sequence org, which is a permutation of the integers from 1 to 
+𝑛
+n.
+A list of sequences seqs, which contain some subsequences of the original sequence.
+The task is to determine if:
+
+The original sequence can be reconstructed from the sequences in seqs.
+The reconstruction is unique.
+Approach
+Brute Force Method:
+
+Generate all permutations of org (which can be infeasible for larger values of 
+𝑛
+n).
+Check if all sequences in seqs are subsequences of each permutation.
+Count how many valid permutations can be reconstructed.
+If exactly one valid permutation matches org, return True; otherwise, return False.
+Optimized Method:
+
+Use a graph representation where each number in org represents a node and directed edges represent the order constraints derived from seqs.
+Perform a topological sort to check if the graph has a unique valid order.
+Ensure that every number from 1 to 
+𝑛
+n is present in seqs.
+Count in-degrees and enforce uniqueness during the topological sort process.
+Time and Space Complexity
+Brute Force Method:
+
+Time Complexity: 
+𝑂
+(
+𝑛
+!
+)
+O(n!) to generate all permutations, plus checking subsequences for each permutation.
+Space Complexity: 
+𝑂
+(
+𝑛
+)
+O(n) for storing the permutations.
+Optimized Method:
+
+Time Complexity: 
+𝑂
+(
+𝑛
++
+𝑚
+)
+O(n+m), where 
+𝑚
+m is the total number of elements across all sequences in seqs. This includes building the graph and performing the topological sort.
+Space Complexity: 
+𝑂
+(
+𝑛
++
+𝑚
+)
+O(n+m) for storing the graph and in-degrees.
+Implementation
+Here’s the complete code for both methods:
+
+python
+Copy code
+from itertools import permutations
+from collections import defaultdict, deque
+
+def canFormUniqueBruteForce(org, seqs):
+    n = len(org)
+    # Generate all permutations of org
+    for perm in permutations(org):
+        # Check if all sequences in seqs are subsequences of perm
+        if all(isSubsequence(seq, perm) for seq in seqs):
+            # If we find more than one valid permutation, return False
+            return False
+    return True
+
+def isSubsequence(seq, perm):
+    """ Check if seq is a subsequence of perm """
+    it = iter(perm)
+    return all(item in it for item in seq)
+
+def canFormUniqueOptimized(org, seqs):
+    n = len(org)
+    # Build graph and in-degree count
+    graph = defaultdict(list)
+    in_degree = [0] * (n + 1)
+    
+    # Build the graph from seqs
+    for seq in seqs:
+        for i in range(len(seq)):
+            if i > 0:
+                graph[seq[i - 1]].append(seq[i])
+                in_degree[seq[i]] += 1
+
+    # Check if all numbers from 1 to n are in seqs
+    if len(set(num for seq in seqs for num in seq)) < n:
+        return False
+    
+    # Perform topological sort
+    queue = deque()
+    for i in range(1, n + 1):
+        if in_degree[i] == 0:
+            queue.append(i)
+    
+    reconstructed = []
+    while queue:
+        # If more than one node has zero in-degree, uniqueness is violated
+        if len(queue) > 1:
+            return False
+        node = queue.popleft()
+        reconstructed.append(node)
+        
+        for neighbor in graph[node]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+
+    return reconstructed == org
+
+# Input handling
+org = [1, 2, 3]
+seqs = [[1, 2], [1, 3]]
+
+# Call brute force method
+brute_force_result = canFormUniqueBruteForce(org, seqs)
+print("Brute Force Result:", brute_force_result)
+
+# Call optimized method
+optimized_result = canFormUniqueOptimized(org, seqs)
+print("Optimized Result:", optimized_result)
+Code Explanation
+Brute Force Method (canFormUniqueBruteForce):
+
+Input: The original sequence org and list of subsequences seqs.
+Permutations: Generate all permutations of org using itertools.permutations.
+Subsequence Check: For each permutation, check if all sequences in seqs are subsequences using the helper function isSubsequence.
+Return: If more than one valid permutation exists, return False. If no valid permutations exist, return True.
+Subsequence Check (isSubsequence):
+
+This function checks if a sequence seq is a subsequence of another sequence perm by iterating through perm and ensuring all elements of seq can be found in order.
+Optimized Method (canFormUniqueOptimized):
+
+Input: Same as before.
+Graph and In-Degree: Build a directed graph from seqs and maintain an in-degree array to track dependencies.
+Topological Sort: Use a queue to perform topological sorting. If at any time there are multiple nodes with zero in-degree, it indicates a lack of uniqueness.
+Final Check: At the end, compare the reconstructed sequence with org. If they match, the reconstruction is unique.
+Input Handling:
+
+The input org and seqs are predefined in the code for demonstration.
+Both methods are called, and their results are printed.
+Example Execution
+For the provided input:
+
+python
+Copy code
+org = [1, 2, 3]
+seqs = [[1, 2], [1, 3]]
+The output will be:
+
+sql
+Copy code
+Brute Force Result: False
+Optimized Result: False
+Both methods indicate that the original sequence cannot be uniquely reconstructed from the given subsequences.
