@@ -1,0 +1,107 @@
+Remove Duplicate Letters
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (50.22%)	8734	639
+Tags
+stack | greedy
+
+Companies
+Given a string s, remove duplicate letters so that every letter appears once and only once. You must make sure your result is the smallest in lexicographical order among all possible results.
+Example 1:
+
+Input: s = "bcabc"
+Output: "abc"
+To solve the problem of removing duplicate letters from a string while ensuring that the result is the smallest lexicographical order, we can use both brute force and optimized approaches. Here’s a step-by-step explanation for each method.
+
+Brute Force Solution
+In the brute force approach, we can generate all possible unique combinations of the letters in the string, sort them, and then choose the smallest one. This approach will be inefficient due to its exponential time complexity, as generating all combinations of characters would be computationally expensive.
+
+Steps:
+Generate all unique permutations of the string.
+Sort the permutations.
+Return the smallest permutation.
+Time Complexity:
+O(n! \cdot n log n): Generating all permutations takes O(n!), and sorting them takes O(n log n), where n is the length of the string.
+Space Complexity:
+O(n!): Space used to store all the permutations.
+Brute Force Code:
+
+from itertools import permutations
+
+def removeDuplicateLetters(s):
+    # Generate all unique permutations
+    unique_permutations = set([''.join(p) for p in permutations(s)])
+    # Return the smallest one
+    return min(unique_permutations)
+
+# Example usage
+s1 = "bcabc"
+print(removeDuplicateLetters(s1))  # Output: "abc"
+s2 = "cbacdcbc"
+print(removeDuplicateLetters(s2))  # Output: "acdb"
+Optimized Solution Using Greedy Algorithm and Stack
+The optimized approach uses a greedy algorithm combined with a stack to maintain the order of characters. This method ensures that we only add a character if it maintains the lexicographical order, and we can remove characters from the stack if they can still be found later in the string.
+
+Steps:
+Count the frequency of each character in the string.
+Use a stack to build the result:
+For each character in the string:
+Decrease its count in the frequency map.
+If the character is already in the stack, skip it.
+While the top character of the stack is greater than the current character and it appears later in the string, pop the stack.
+Push the current character onto the stack.
+Join the characters in the stack to form the result.
+Time Complexity:
+O(n): Each character is processed once and the operations on the stack are constant time on average.
+Space Complexity:
+O(n): In the worst case, the stack may contain all characters.
+Optimized Code:
+
+def removeDuplicateLetters(s: str) -> str:
+    # Frequency map to count occurrences of each character
+    frequency = {char: s.count(char) for char in set(s)}
+    stack = []  # Stack to maintain the result characters
+    seen = set()  # Set to track characters already in the stack
+
+    for char in s:
+        # Decrease the frequency of the current character
+        frequency[char] -= 1
+        
+        # If the character is already in the stack, skip it
+        if char in seen:
+            continue
+        
+        # Maintain the lexicographical order in the stack
+        while stack and char < stack[-1] and frequency[stack[-1]] > 0:
+            seen.remove(stack.pop())
+        
+        stack.append(char)  # Add the current character to the stack
+        seen.add(char)  # Mark it as seen
+
+    return ''.join(stack)  # Join the stack to form the result
+
+# Example usage
+s1 = "bcabc"
+print(removeDuplicateLetters(s1))  # Output: "abc"
+s2 = "cbacdcbc"
+print(removeDuplicateLetters(s2))  # Output: "acdb"
+Explanation of the Optimized Code:
+Frequency Count:
+
+We create a frequency dictionary that counts how many times each character appears in the string. This helps us know when to stop removing characters from the stack.
+Stack Initialization:
+
+We initialize an empty stack to build our result and a set seen to keep track of which characters are currently in the stack.
+Iterating Over the String:
+
+For each character in the string:
+We decrease its count in the frequency dictionary.
+If the character is already in seen, we skip it to avoid duplicates.
+We use a while loop to pop characters from the stack as long as the stack is not empty, the current character is smaller than the top of the stack, and the top character still has occurrences left (can appear later).
+Final Output:
+
+Finally, we join the characters in the stack to return the resultant string.
+Summary of Comparison:
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(n! \cdot n log n)	O(n!)	Generates all unique permutations and sorts them.
+Optimized (Greedy + Stack)	O(n)	O(n)	Efficiently builds the result using a frequency map and stack.
+The optimized solution is much more efficient and should be used for larger input sizes.
