@@ -1,0 +1,188 @@
+Predict the Winner
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (55.44%)	5893	284
+Tags
+dynamic-programming | minimax
+
+Companies
+You are given an integer array nums. Two players are playing a game with this array: player 1 and player 2.
+
+Player 1 and player 2 take turns, with player 1 starting first. Both players start the game with a score of 0. At each turn, the player takes one of the numbers from either end of the array (i.e., nums[0] or nums[nums.length - 1]) which reduces the size of the array by 1. The player adds the chosen number to their score. The game ends when there are no more elements in the array.
+
+Return true if Player 1 can win the game. If the scores of both players are equal, then player 1 is still the winner, and you should also return true. You may assume that both players are playing optimally.
+
+ 
+
+Example 1:
+
+Input: nums = [1,5,2]
+Output: false
+Explanation: Initially, player 1 can choose between 1 and 2. 
+If he chooses 2 (or 1), then player 2 can choose from 1 (or 2) and 5. If player 2 chooses 5, then player 1 will be left with 1 (or 2). 
+So, final score of player 1 is 1 + 2 = 3, and player 2 is 5. 
+Hence, player 1 will never be the winner and you need to return false.
+  To solve the "Predict the Winner" problem, we will use a dynamic programming approach, which is well-suited for problems involving game theory and optimal strategies.
+
+Problem Breakdown
+Game Rules:
+
+Players can pick numbers from either end of the array.
+Players aim to maximize their score while minimizing their opponent's score.
+Player 1 wins if their score is greater than or equal to Player 2's score.
+Optimal Strategy:
+
+Since both players play optimally, we need to determine if Player 1 can guarantee a win based on the scores they can achieve from the given choices.
+Approach
+We can use a dynamic programming (DP) approach to keep track of the maximum score Player 1 can achieve over Player 2 for every possible subarray defined by its start and end indices.
+
+DP Table Definition:
+
+Let dp[i][j] represent the maximum score Player 1 can achieve over Player 2 from the subarray nums[i] to nums[j].
+Recurrence Relation:
+
+When Player 1 chooses nums[i], Player 2 will play optimally and choose the maximum of the two remaining options:
+𝑑
+𝑝
+[
+𝑖
+]
+[
+𝑗
+]
+=
+max
+⁡
+(
+𝑛
+𝑢
+𝑚
+𝑠
+[
+𝑖
+]
+−
+𝑑
+𝑝
+[
+𝑖
++
+1
+]
+[
+𝑗
+]
+,
+𝑛
+𝑢
+𝑚
+𝑠
+[
+𝑗
+]
+−
+𝑑
+𝑝
+[
+𝑖
+]
+[
+𝑗
+−
+1
+]
+)
+dp[i][j]=max(nums[i]−dp[i+1][j],nums[j]−dp[i][j−1])
+The base case occurs when there's only one number:
+𝑑
+𝑝
+[
+𝑖
+]
+[
+𝑖
+]
+=
+𝑛
+𝑢
+𝑚
+𝑠
+[
+𝑖
+]
+dp[i][i]=nums[i]
+Final Decision:
+
+Player 1 can guarantee a win if dp[0][n - 1] >= 0, where n is the length of the nums array.
+Time and Space Complexity
+Time Complexity: O(n²), where 
+𝑛
+n is the length of the input array. This is due to filling out the DP table.
+Space Complexity: O(n²) as we need a 2D table for DP.
+Brute Force Solution
+The brute force approach would recursively explore all possible choices for both players, calculating scores without memoization, which is not efficient for larger inputs.
+
+Brute Force Code Implementation
+python
+Copy code
+def canWin(nums):
+    """Brute force solution to determine if Player 1 can win."""
+    def score(start, end):
+        # Base case: when there's only one element
+        if start == end:
+            return nums[start]
+        
+        # Player 1's score if they take nums[start] or nums[end]
+        return max(nums[start] - score(start + 1, end), nums[end] - score(start, end - 1))
+
+    return score(0, len(nums) - 1) >= 0
+
+# Example usage
+nums = [1, 5, 2]
+print(canWin(nums))  # Output: False
+Optimized Solution
+Now, let's implement the dynamic programming solution based on the approach we discussed.
+
+Optimized Code Implementation
+python
+Copy code
+def PredictTheWinner(nums):
+    """Optimized solution to determine if Player 1 can win using dynamic programming."""
+    n = len(nums)
+    
+    # Create a 2D DP array
+    dp = [[0] * n for _ in range(n)]
+    
+    # Base case: when there's only one element
+    for i in range(n):
+        dp[i][i] = nums[i]
+    
+    # Fill the DP table
+    for length in range(2, n + 1):  # length of the subarray
+        for start in range(n - length + 1):
+            end = start + length - 1
+            dp[start][end] = max(nums[start] - dp[start + 1][end], nums[end] - dp[start][end - 1])
+    
+    # Player 1 can win if their score is non-negative
+    return dp[0][n - 1] >= 0
+
+# Example usage
+nums = [1, 5, 233, 7]
+print(PredictTheWinner(nums))  # Output: True
+Explanation of the Optimized Code
+Initialization: We initialize a 2D list dp where dp[i][j] stores the maximum score difference Player 1 can achieve over Player 2 when playing optimally on the subarray nums[i] to nums[j].
+
+Base Case: When start equals end, the only choice for Player 1 is to take nums[i], hence dp[i][i] = nums[i].
+
+Filling the DP Table:
+
+We iterate over all possible lengths of subarrays from 2 to 
+𝑛
+n.
+For each subarray defined by start and end, we calculate the best score Player 1 can guarantee by choosing either the leftmost or the rightmost number.
+Final Result: The decision to return whether Player 1 can win is based on whether dp[0][n-1] is non-negative.
+
+Summary of Comparison
+Approach	Time Complexity	Space Complexity	Explanation
+Brute Force	O(2^n)	O(n)	Explores all choices recursively without memoization.
+Optimized	O(n²)	O(n²)	Uses dynamic programming to minimize recomputation.
+The optimized solution is significantly more efficient and should be used for larger inputs.
