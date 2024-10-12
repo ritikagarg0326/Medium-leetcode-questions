@@ -1,0 +1,189 @@
+Find Duplicate Subtrees
+Category	Difficulty	Likes	Dislikes
+algorithms	Medium (59.67%)	5877	478
+Tags
+tree
+
+Companies
+Given the root of a binary tree, return all duplicate subtrees.
+
+For each kind of duplicate subtrees, you only need to return the root node of any one of them.
+
+Two trees are duplicate if they have the same structure with the same node values.
+To solve the problem of finding duplicate subtrees in a binary tree, we can employ both brute force and optimized approaches. Here's a detailed breakdown of each method, including time and space complexities, followed by the complete code.
+
+Problem Overview
+We need to identify and return all duplicate subtrees in a binary tree. A subtree is considered a duplicate if it has the same structure and node values as another subtree in the tree.
+
+Brute Force Solution
+Understanding the Brute Force Approach:
+
+In this approach, we can traverse the tree and, for each node, compare the entire subtree rooted at that node with all other subtrees in the tree.
+This means for every node, we will perform a traversal of its subtree and check if it matches with any previously seen subtree.
+Time Complexity:
+
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ): The outer loop runs for 
+𝑛
+n nodes, and for each node, we may need to traverse up to 
+𝑛
+n nodes to compare the subtree, resulting in quadratic time complexity.
+Space Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): We use space to store the list of duplicate subtrees, where 
+𝑛
+n is the number of nodes in the tree.
+Optimized Solution
+Understanding the Optimized Approach:
+
+Instead of checking every subtree against every other subtree, we can serialize each subtree into a string representation.
+We can use a hash map (dictionary) to track occurrences of these serialized subtrees.
+When a subtree serialization is found in the hash map for the second time, it indicates a duplicate, and we can add it to our result list.
+Time Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): Each node is visited once, and the serialization of each subtree takes linear time relative to the size of that subtree.
+Space Complexity:
+
+𝑂
+(
+𝑛
+)
+O(n): In the worst case, we may store all unique subtree serializations in our hash map.
+Full Code Implementation
+Here's the complete Python implementation for both the brute force and optimized approaches:
+
+python
+Copy code
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def findDuplicateSubtrees_brute_force(root):
+    """Brute force solution to find duplicate subtrees."""
+    def serialize(node):
+        if not node:
+            return "#"
+        return f"{node.val},{serialize(node.left)},{serialize(node.right)}"
+    
+    def is_duplicate(node, all_subtrees):
+        serialized = serialize(node)
+        if serialized in all_subtrees:
+            all_subtrees[serialized] += 1
+        else:
+            all_subtrees[serialized] = 1
+            
+    all_subtrees = {}
+    duplicates = []
+    
+    def traverse(node):
+        if not node:
+            return
+        is_duplicate(node, all_subtrees)
+        if all_subtrees[serialize(node)] == 2:
+            duplicates.append(node)
+        traverse(node.left)
+        traverse(node.right)
+    
+    traverse(root)
+    return duplicates
+
+def findDuplicateSubtrees_optimized(root):
+    """Optimized solution to find duplicate subtrees."""
+    from collections import defaultdict
+    
+    def serialize(node):
+        if not node:
+            return "#"
+        return f"{node.val},{serialize(node.left)},{serialize(node.right)}"
+    
+    subtree_count = defaultdict(int)
+    duplicates = []
+
+    def traverse(node):
+        if not node:
+            return
+        serialized = serialize(node)
+        subtree_count[serialized] += 1
+        if subtree_count[serialized] == 2:
+            duplicates.append(node)
+        traverse(node.left)
+        traverse(node.right)
+
+    traverse(root)
+    return duplicates
+
+# Input handling
+def main():
+    # Helper function to create a binary tree from list
+    def create_tree(nodes):
+        if not nodes:
+            return None
+        
+        root = TreeNode(nodes[0])
+        queue = [root]
+        index = 1
+        
+        while queue and index < len(nodes):
+            current = queue.pop(0)
+            if nodes[index] is not None:
+                current.left = TreeNode(nodes[index])
+                queue.append(current.left)
+            index += 1
+            
+            if index < len(nodes) and nodes[index] is not None:
+                current.right = TreeNode(nodes[index])
+                queue.append(current.right)
+            index += 1
+        
+        return root
+
+    # Example input
+    input_data = [1, 2, 3, 4, None, 2, 4, None, None, 4]
+    root = create_tree(input_data)
+
+    print("Input Tree:", input_data)
+
+    # Brute Force Result
+    brute_force_result = findDuplicateSubtrees_brute_force(root)
+    print("Duplicate Subtrees (Brute Force):", [node.val for node in brute_force_result])
+
+    # Optimized Result
+    optimized_result = findDuplicateSubtrees_optimized(root)
+    print("Duplicate Subtrees (Optimized):", [node.val for node in optimized_result])
+
+if __name__ == "__main__":
+    main()
+Explanation of the Code
+TreeNode Class:
+
+Defines the structure of a tree node with a value, a left child, and a right child.
+Brute Force Function:
+
+serialize(node): Serializes a subtree rooted at node into a string format. Each null child is represented by a #.
+is_duplicate(node, all_subtrees): Checks if the serialized form of node has been seen before and updates the count in all_subtrees.
+traverse(node): Recursively traverses the tree and calls the duplicate check for each subtree.
+Optimized Function:
+
+Uses a similar serialization method but tracks subtree occurrences with a dictionary. Duplicates are added to the duplicates list when they appear for the second time.
+main() Function:
+
+Creates a sample binary tree from the given list and invokes both the brute force and optimized functions, printing the results.
+This implementation effectively finds and outputs duplicate subtrees, demonstrating both naive and efficient techniques. The optimized approach is more suitable for larger trees due to its reduced time complexity.
+
+ 
