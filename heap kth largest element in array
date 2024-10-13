@@ -1,0 +1,234 @@
+ Kth Largest Element in an Array
+
+Given an integer array nums and an integer k, return the kth largest element in the array.
+
+Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+Can you solve it without sorting?
+
+Example 1:
+
+Input: nums = [3,2,1,5,6,4], k = 2
+Output: 5
+Problem Explanation:
+Given an integer array nums and an integer k, we are tasked with finding the kth largest element in the array. The solution should find the kth largest element without necessarily sorting the entire array.
+
+Approach
+We will consider two approaches:
+
+Brute Force Solution: This approach will involve sorting the entire array and then picking the kth largest element.
+Optimized Solution: This approach will make use of a min-heap to track the largest k elements, which is more efficient than sorting for larger arrays.
+1. Brute Force Approach:
+In this approach, we will sort the array in descending order and then return the kth element. While simple, this method can be inefficient for large arrays.
+
+Steps:
+Sort the array in descending order.
+Return the element at index k-1.
+Time Complexity:
+Sorting the array takes 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn), where 
+𝑛
+n is the number of elements in the array.
+Extracting the kth element takes 
+𝑂
+(
+1
+)
+O(1).
+Overall Time Complexity: 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn).
+Space Complexity:
+Sorting the array in-place takes 
+𝑂
+(
+1
+)
+O(1) additional space.
+Overall Space Complexity: 
+𝑂
+(
+1
+)
+O(1).
+2. Optimized Approach using Min-Heap:
+We can use a min-heap of size k to keep track of the largest k elements in the array. The idea is to maintain a heap of size k, where the smallest element in the heap is the kth largest element in the array.
+
+Steps:
+Use a min-heap (priority queue) to store the largest k elements.
+As we traverse the array, maintain the heap such that the size does not exceed k.
+Once we have processed all elements, the root of the heap will be the kth largest element.
+Time Complexity:
+Inserting an element into the heap takes 
+𝑂
+(
+log
+⁡
+𝑘
+)
+O(logk).
+We process all elements in the array, so the total time complexity is 
+𝑂
+(
+𝑛
+log
+⁡
+𝑘
+)
+O(nlogk), where 
+𝑛
+n is the number of elements.
+Overall Time Complexity: 
+𝑂
+(
+𝑛
+log
+⁡
+𝑘
+)
+O(nlogk).
+Space Complexity:
+The space complexity is 
+𝑂
+(
+𝑘
+)
+O(k) for storing the heap.
+Overall Space Complexity: 
+𝑂
+(
+𝑘
+)
+O(k).
+Full Python Code Implementation
+python
+Copy code
+import heapq
+
+# Brute force solution
+def findKthLargestBruteForce(nums, k):
+    # Sort the array in descending order
+    nums.sort(reverse=True)
+    # Return the kth largest element (index k-1)
+    return nums[k-1]
+
+# Optimized solution using Min-Heap
+def findKthLargestOptimized(nums, k):
+    # Create a min-heap with the first k elements
+    heap = nums[:k]
+    heapq.heapify(heap)  # Convert the list into a heap
+    
+    # Iterate over the rest of the elements
+    for num in nums[k:]:
+        # If current number is larger than the smallest in heap, replace it
+        if num > heap[0]:
+            heapq.heappushpop(heap, num)
+    
+    # The root of the heap is the kth largest element
+    return heap[0]
+
+# Input handling
+nums = list(map(int, input("Enter the array of integers separated by space: ").split()))
+k = int(input("Enter the value of k: "))
+
+# Brute force result
+result_brute_force = findKthLargestBruteForce(nums, k)
+print("Kth largest element (Brute Force):", result_brute_force)
+
+# Optimized result
+result_optimized = findKthLargestOptimized(nums, k)
+print("Kth largest element (Optimized):", result_optimized)
+Explanation of Code
+1. Brute Force Approach:
+findKthLargestBruteForce:
+The sort function is used to sort the array in descending order.
+After sorting, we return the element at index k-1, which is the kth largest.
+2. Optimized Approach (Min-Heap):
+findKthLargestOptimized:
+We first create a heap using the first k elements of the array.
+heapq.heapify(heap) ensures the list becomes a min-heap in 
+𝑂
+(
+𝑘
+)
+O(k).
+We then iterate through the remaining elements in the array. If an element is larger than the smallest element in the heap (i.e., the root), we replace the root using heapq.heappushpop(heap, num) in 
+𝑂
+(
+log
+⁡
+𝑘
+)
+O(logk).
+After processing all elements, the root of the heap will be the kth largest element.
+Example Run
+Input:
+makefile
+Copy code
+nums = [3, 2, 1, 5, 6, 4]
+k = 2
+Output:
+java
+Copy code
+Kth largest element (Brute Force): 5
+Kth largest element (Optimized): 5
+Input:
+makefile
+Copy code
+nums = [3, 2, 3, 1, 2, 4, 5, 5, 6]
+k = 4
+Output:
+java
+Copy code
+Kth largest element (Brute Force): 4
+Kth largest element (Optimized): 4
+Time and Space Complexity
+Brute Force:
+Time Complexity: 
+𝑂
+(
+𝑛
+log
+⁡
+𝑛
+)
+O(nlogn) due to sorting.
+Space Complexity: 
+𝑂
+(
+1
+)
+O(1), if we sort in-place.
+Optimized (Min-Heap):
+Time Complexity: 
+𝑂
+(
+𝑛
+log
+⁡
+𝑘
+)
+O(nlogk), where 
+𝑛
+n is the number of elements and 
+𝑘
+k is the size of the heap.
+Space Complexity: 
+𝑂
+(
+𝑘
+)
+O(k) due to the heap size.
