@@ -1,0 +1,220 @@
+Shortest Bridge
+
+You are given an n x n binary matrix grid where 1 represents land and 0 represents water.
+
+An island is a 4-directionally connected group of 1's not connected to any other 1's. There are exactly two islands in grid.
+
+You may change 0's to 1's to connect the two islands to form one island.
+
+Return the smallest number of 0's you must flip to connect the two islands.
+
+Example 1:
+
+Input: grid = [[0,1],[1,0]]
+Output: 1
+To solve the problem of finding the shortest bridge between two islands in a binary matrix, we can approach it in two main ways: a brute-force method and a more optimized approach using breadth-first search (BFS).
+
+Problem Explanation
+Given a binary matrix where 1 represents land and 0 represents water, the task is to connect two separate islands (groups of 1s) by flipping the minimum number of 0s to 1s.
+
+Approach
+Brute Force: This method will involve exploring all possible ways to connect the two islands by flipping 0s to 1s, which can be inefficient for larger matrices.
+
+Optimized Solution (BFS): This method will involve performing a BFS starting from one island and expanding into the water cells until we reach the second island, keeping track of the number of 0s we have flipped. This approach is more efficient and works well within the problem's constraints.
+
+Solution 1: Brute Force
+Time Complexity:
+Time: 
+𝑂
+(
+𝑛
+2
+×
+𝑛
+2
+)
+O(n 
+2
+ ×n 
+2
+ ) due to the need to check all possible connections between the two islands, which can be very slow.
+Space: 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ) for storing the grid.
+Brute Force Code:
+Although this brute-force solution is not optimal, here’s how you might approach it:
+
+python
+Copy code
+def shortestBridge(grid):
+    n = len(grid)
+    
+    def dfs(i, j, island):
+        # Perform DFS to mark all parts of the island
+        if i < 0 or i >= n or j < 0 or j >= n or grid[i][j] == 0:
+            return
+        grid[i][j] = 0  # Mark the land as visited by sinking the island
+        island.append((i, j))
+        dfs(i + 1, j, island)
+        dfs(i - 1, j, island)
+        dfs(i, j + 1, island)
+        dfs(i, j - 1, island)
+
+    # Find the first island
+    first_island = []
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == 1:
+                dfs(i, j, first_island)
+                break
+        if first_island:
+            break
+
+    # Initialize the minimum distance to the second island
+    min_distance = float('inf')
+
+    # BFS to find the shortest path to the second island
+    def bfs():
+        nonlocal min_distance
+        queue = first_island[:]
+        distance = 0
+        while queue:
+            next_queue = []
+            for x, y in queue:
+                for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < n and 0 <= ny < n:
+                        if grid[nx][ny] == 1:
+                            min_distance = min(min_distance, distance)
+                        elif grid[nx][ny] == 0:
+                            next_queue.append((nx, ny))
+                            grid[nx][ny] = -1  # Mark visited water
+            queue = next_queue
+            distance += 1
+
+    bfs()
+
+    return min_distance
+
+# Example input
+grid = [[0,1],[1,0]]
+# Output
+print(shortestBridge(grid))  # Output: 1
+Explanation of Brute Force Solution:
+DFS Function:
+
+This function is used to traverse the first island using depth-first search, marking its cells as visited and storing their coordinates.
+Finding the First Island:
+
+The code loops through the grid until it finds a 1, then calls DFS to mark the entire island and stores its coordinates.
+BFS Function:
+
+This function attempts to expand from the first island into the water, checking if it can reach the second island by counting how many 0s (water) it must flip to 1.
+It updates the minimum distance whenever it encounters a 1.
+Returning the Result:
+
+Finally, it returns the minimum number of 0s that need to be flipped.
+Solution 2: Optimized Solution (BFS)
+The optimized approach involves first finding the coordinates of one island and then using BFS to explore the shortest path to the other island.
+
+Time Complexity:
+Time: 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ) in the worst case, where we may need to explore the entire grid.
+Space: 
+𝑂
+(
+𝑛
+2
+)
+O(n 
+2
+ ) for the queue and visited cells.
+Optimized Code:
+python
+Copy code
+from collections import deque
+
+def shortestBridge(grid):
+    n = len(grid)
+    visited = [[False] * n for _ in range(n)]
+    
+    def dfs(i, j):
+        stack = [(i, j)]
+        while stack:
+            x, y = stack.pop()
+            if not (0 <= x < n and 0 <= y < n) or visited[x][y] or grid[x][y] == 0:
+                continue
+            visited[x][y] = True
+            island.append((x, y))
+            stack.append((x + 1, y))
+            stack.append((x - 1, y))
+            stack.append((x, y + 1))
+            stack.append((x, y - 1))
+    
+    # Find the first island and mark it visited
+    island = []
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == 1:
+                dfs(i, j)
+                break
+        if island:
+            break
+
+    # BFS from the first island to find the shortest path to the second island
+    queue = deque(island)
+    distance = 0
+    
+    while queue:
+        for _ in range(len(queue)):
+            x, y = queue.popleft()
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < n and 0 <= ny < n:
+                    if grid[nx][ny] == 1:
+                        return distance  # Found the second island
+                    elif grid[nx][ny] == 0 and not visited[nx][ny]:
+                        visited[nx][ny] = True
+                        queue.append((nx, ny))
+        distance += 1
+
+    return -1  # This should never be reached since there are exactly two islands
+
+# Example input
+grid = [[0,1,0],[0,0,0],[0,0,1]]
+# Output
+print(shortestBridge(grid))  # Output: 2
+Explanation of Optimized Solution:
+Visited Matrix:
+
+A matrix to keep track of which cells have already been processed.
+DFS Function:
+
+Similar to the brute-force method, this function marks the entire first island as visited and stores its coordinates in a list.
+BFS Expansion:
+
+Starting from the first island, BFS explores neighboring cells. If it reaches another island (a cell with 1), it returns the distance (the minimum number of flips).
+Returning the Result:
+
+The result is the minimum number of 0s that need to be flipped to connect the two islands.
+Conclusion:
+The brute-force solution is not efficient and can be quite slow for larger grids.
+The optimized BFS approach is much more efficient, operates in linear time concerning the number of cells in the grid, and is suitable for the given constraints.
+
+
+
+
+
