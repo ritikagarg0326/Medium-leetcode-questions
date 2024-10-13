@@ -1,0 +1,206 @@
+Reorganize String
+
+Given a string s, rearrange the characters of s so that any two adjacent characters are not the same.
+
+Return any possible rearrangement of s or return "" if not possible.
+
+Example 1:
+
+Input: s = "aab"
+Output: "aba"
+Approach
+We will consider two approaches:
+
+Brute Force Solution: Generate all permutations of the string and check if any permutation meets the condition.
+Optimized Solution using a Max Heap (Greedy Approach): Efficiently rearrange the characters using a max heap to ensure no two adjacent characters are the same.
+1. Brute Force Approach:
+The brute force solution would involve generating all permutations of the string and checking whether any permutation has no two adjacent characters that are the same.
+
+Steps:
+Generate all possible permutations of the string.
+For each permutation, check if no two adjacent characters are the same.
+If such a permutation is found, return it.
+If no valid permutation is found, return an empty string.
+Time Complexity:
+Generating all permutations of a string of length n takes 
+𝑂
+(
+𝑛
+!
+)
+O(n!) time.
+Checking each permutation takes 
+𝑂
+(
+𝑛
+)
+O(n), so the overall complexity is 
+𝑂
+(
+𝑛
+!
+×
+𝑛
+)
+O(n!×n).
+Space Complexity:
+Storing all permutations takes 
+𝑂
+(
+𝑛
+!
+)
+O(n!) space.
+Limitations:
+This approach is not feasible for strings with length greater than 8–10 due to factorial time complexity.
+
+2. Optimized Approach using a Max-Heap (Greedy Algorithm):
+To solve this problem more efficiently, we can use a greedy approach with a max-heap (priority queue) to always place the most frequent character that is not the same as the last placed character.
+
+Steps:
+Count frequencies of characters: First, we count the frequency of each character in the string.
+Max-Heap: We use a max-heap (implemented as a priority queue in Python) to always pick the character with the highest frequency that is not the same as the last placed character.
+Rearrange characters: We keep placing the most frequent character and update the heap after reducing its frequency.
+Handle special cases: If any character's frequency exceeds half of the string length (i.e., count > (n + 1) // 2), it is impossible to rearrange, so we return an empty string.
+Time Complexity:
+Building the frequency count and heap takes 
+𝑂
+(
+𝑛
++
+26
+log
+⁡
+26
+)
+=
+𝑂
+(
+𝑛
+)
+O(n+26log26)=O(n), since there are at most 26 distinct letters.
+Rearranging the characters takes 
+𝑂
+(
+𝑛
+log
+⁡
+26
+)
+=
+𝑂
+(
+𝑛
+)
+O(nlog26)=O(n), since we are pushing and popping from a heap of size at most 26.
+Overall Time Complexity: 
+𝑂
+(
+𝑛
+)
+O(n).
+Space Complexity:
+The heap and frequency count both take 
+𝑂
+(
+26
+)
+=
+𝑂
+(
+1
+)
+O(26)=O(1) space, since we are only dealing with a constant number of characters.
+Overall Space Complexity: 
+𝑂
+(
+𝑛
+)
+O(n) due to the output string.
+Full Python Code Implementation
+Optimized Solution (Using a Max-Heap)
+python
+Copy code
+import heapq
+from collections import Counter
+
+def reorganizeString(s: str) -> str:
+    # Step 1: Count frequencies of each character
+    freq = Counter(s)
+    
+    # Step 2: Create a max-heap based on the frequency of characters
+    max_heap = [(-count, char) for char, count in freq.items()]
+    heapq.heapify(max_heap)  # Heapify in O(n) time
+    
+    # Step 3: Build the output string
+    prev_count, prev_char = 0, ''
+    result = []
+    
+    while max_heap:
+        count, char = heapq.heappop(max_heap)  # Get the most frequent character
+        result.append(char)
+        
+        # If there's a previous character that needs to be reinserted, do it
+        if prev_count < 0:
+            heapq.heappush(max_heap, (prev_count, prev_char))
+        
+        # Update previous character info
+        prev_count, prev_char = count + 1, char  # Decrement count and set as previous
+        
+    # Step 4: Check if the result is valid
+    result_str = ''.join(result)
+    if len(result_str) == len(s):
+        return result_str
+    else:
+        return ""
+
+# Input handling
+s = input("Enter the string: ")
+
+# Output the reorganized string
+output = reorganizeString(s)
+print("Reorganized String:", output)
+Explanation of the Code:
+1. Count Frequencies:
+We first count the frequency of each character using Counter from the collections module. This gives us a dictionary where the key is the character and the value is its frequency.
+2. Max-Heap:
+We create a max-heap where the key is the negative of the frequency because Python's heapq is a min-heap by default. By using negative values, we simulate a max-heap.
+3. Greedy Character Selection:
+At each step, we pop the most frequent character from the heap (the character with the highest count).
+We append this character to the result string.
+If there was a previously used character that still has remaining occurrences, we push it back into the heap.
+4. Check Validity:
+Finally, we check if the length of the constructed result string is equal to the input string length. If not, it means it was impossible to rearrange the string, so we return "".
+Example Runs:
+Input 1:
+makefile
+Copy code
+s = "aab"
+Output:
+
+arduino
+Copy code
+Reorganized String: "aba"
+Input 2:
+makefile
+Copy code
+s = "aaab"
+Output:
+
+arduino
+Copy code
+Reorganized String: ""
+Time and Space Complexity:
+Optimized Solution (Using Max-Heap):
+Time Complexity: 
+𝑂
+(
+𝑛
+)
+O(n), since we are processing each character once and maintaining a heap of size at most 26.
+Space Complexity: 
+𝑂
+(
+𝑛
+)
+O(n), since we are storing the result string and the frequency count.
