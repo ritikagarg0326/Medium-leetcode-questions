@@ -1,0 +1,177 @@
+Furthest Building You Can Reach
+Medium
+
+You are given an integer array heights representing the heights of buildings, some bricks, and some ladders.
+
+You start your journey from building 0 and move to the next building by possibly using bricks or ladders.
+
+While moving from building i to building i+1 (0-indexed),
+
+If the current building's height is greater than or equal to the next building's height, you do not need a ladder or bricks.
+If the current building's height is less than the next building's height, you can either use one ladder or (h[i+1] - h[i]) bricks.
+Return the furthest building index (0-indexed) you can reach if you use the given ladders and bricks optimally.
+Problem Explanation:
+We are given an array heights representing the heights of buildings, along with a specific number of bricks and ladders. The goal is to determine how far you can travel across the buildings starting from the first building (index 0), by either using bricks or ladders optimally whenever you encounter a height difference between two buildings where the current building is shorter than the next one.
+
+We need to:
+
+Either use bricks (equal to the difference in heights) or ladders (which allow you to bypass the height difference without using bricks).
+Return the furthest building index you can reach.
+Approach
+We'll approach the solution in two ways:
+
+Brute Force Approach: This will involve directly using bricks or ladders at each step and checking which combination allows us to go the farthest.
+Optimized Approach using a Min-Heap (Greedy Algorithm): We prioritize using ladders for the largest height jumps and bricks for smaller jumps.
+1. Brute Force Approach:
+The brute force approach would involve trying every possible way to use bricks and ladders at each height difference, but this would be inefficient. The number of buildings can go up to 
+1
+0
+5
+10 
+5
+ , so a brute force solution would have exponential time complexity and would not be feasible.
+
+Steps:
+Start at the first building.
+For each subsequent building, compare heights.
+If the next building is taller:
+Use bricks or a ladder.
+Keep track of when we run out of bricks or ladders, and return the current building index when no further moves are possible.
+Time Complexity:
+The brute force approach would take 
+𝑂
+(
+2
+𝑛
+)
+O(2 
+n
+ ), where 
+𝑛
+n is the number of buildings. This is because we have multiple options (bricks or ladders) for each step.
+This approach is not feasible for large inputs.
+
+2. Optimized Approach using a Min-Heap (Greedy Algorithm):
+Key Idea:
+We want to prioritize using ladders for the largest jumps in height and use bricks for smaller jumps.
+We can utilize a min-heap to keep track of the smallest jumps that we've made using bricks.
+Whenever we run out of bricks, we can replace the largest jump (stored in the heap) with a ladder if one is available, effectively conserving bricks for smaller jumps.
+Steps:
+Start from the first building and iterate over the rest.
+For each jump to a taller building, calculate the height difference.
+Use a min-heap to store the height differences for which bricks have been used.
+If the total height difference (bricks used so far) exceeds the available bricks, try to replace the largest jump (from the heap) with a ladder.
+If all ladders are used and we cannot make the jump, return the current building index.
+Time Complexity:
+O(n log k), where n is the number of buildings and k is the number of height jumps where bricks were used (which is at most equal to the number of buildings).
+For each building, we may insert or remove an element from the heap, which takes 
+𝑂
+(
+log
+⁡
+𝑘
+)
+O(logk).
+Space Complexity:
+O(k), where k is the number of height jumps that are stored in the heap. This is proportional to the number of buildings.
+Full Python Code Implementation
+python
+Copy code
+import heapq
+
+def furthestBuilding(heights, bricks, ladders):
+    # Min-heap to track the height differences where bricks are used
+    heap = []
+    
+    for i in range(len(heights) - 1):
+        # Calculate the height difference between the current and next building
+        diff = heights[i+1] - heights[i]
+        
+        # Only consider cases where the next building is taller
+        if diff > 0:
+            heapq.heappush(heap, diff)  # Push the difference onto the heap
+            
+            # If we've used more bricks than we have available
+            if len(heap) > ladders:
+                # Use bricks for the smallest difference so far
+                bricks -= heapq.heappop(heap)
+            
+            # If bricks run out, we can't go further
+            if bricks < 0:
+                return i
+    
+    # If we made it through all buildings
+    return len(heights) - 1
+
+# Input handling
+heights = list(map(int, input("Enter the heights of buildings: ").split()))
+bricks = int(input("Enter the number of bricks: "))
+ladders = int(input("Enter the number of ladders: "))
+
+# Output the furthest building that can be reached
+result = furthestBuilding(heights, bricks, ladders)
+print("Furthest Building Reached:", result)
+Explanation of the Code:
+1. Heap for Height Differences:
+We use a min-heap (heapq) to store the height differences where bricks are used. The smallest height differences will be at the top of the heap.
+2. Iterating Over Buildings:
+For each pair of consecutive buildings:
+We calculate the height difference.
+If the height difference is positive (i.e., the next building is taller), we push it to the heap.
+3. Managing Bricks and Ladders:
+If the number of jumps stored in the heap exceeds the number of ladders we have, it means we need to start using bricks for some of these jumps.
+We use bricks for the smallest jump (min-heap property) by popping from the heap.
+If we run out of bricks, we return the index of the current building.
+4. Return the Furthest Building:
+If we make it through all the buildings without running out of bricks or ladders, we return the index of the last building.
+Example Runs:
+Input 1:
+makefile
+Copy code
+heights = [4,2,7,6,9,14,12]
+bricks = 5
+ladders = 1
+Output:
+
+yaml
+Copy code
+Furthest Building Reached: 4
+Input 2:
+makefile
+Copy code
+heights = [4,12,2,7,3,18,20,3,19]
+bricks = 10
+ladders = 2
+Output:
+
+yaml
+Copy code
+Furthest Building Reached: 7
+Input 3:
+makefile
+Copy code
+heights = [14,3,19,3]
+bricks = 17
+ladders = 0
+Output:
+
+yaml
+Copy code
+Furthest Building Reached: 3
+Time and Space Complexity:
+Optimized Solution (Using Min-Heap):
+Time Complexity: 
+𝑂
+(
+𝑛
+log
+⁡
+𝑘
+)
+O(nlogk), where n is the number of buildings and k is the number of jumps where bricks are used.
+Space Complexity: 
+𝑂
+(
+𝑘
+)
+O(k), where k is the number of jumps stored in the heap.
